@@ -1,10 +1,10 @@
 import sys
 
 from errors import LoxRuntimeError
-from expr import Expr
 from interpreter import Interpreter
 from parser import Parser
 from scanner import Scanner
+from stmt import Stmt
 from tokenclass import *
 
 
@@ -34,12 +34,12 @@ class Lox:
         tokens: list[Token] = scanner.scan_tokens()
 
         parser: Parser = Parser(tokens, self)
-        expr: Expr = parser.parse()
+        statements: list[Stmt] = parser.parse()
 
         if self.had_error:
             return
 
-        self.__interpreter.interpret(expr)
+        self.__interpreter.interpret(statements)
 
     def run_repl(self) -> None:
         while True:
