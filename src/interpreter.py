@@ -2,6 +2,7 @@ from typing import SupportsFloat
 
 from errors import LoxRuntimeError
 from expr import *
+from stmt import *
 from tokenclass import *
 
 
@@ -27,10 +28,10 @@ class Interpreter:
              TokenType.EQUAL_EQUAL: lambda _, l, r: self.__is_equal(l, r)
              }
 
-    def interpret(self, expr: Expr) -> None:
+    def interpret(self, statements: list[Stmt]) -> None:
         try:
-            value: object = self.__evaluate(expr)
-            print(self.__stringify(value))
+            for statement in statements:
+                self.__execute(statement)
         except LoxRuntimeError as err:
             self.__lox_main.runtime_error(err)
 
@@ -52,8 +53,18 @@ class Interpreter:
 
         return self.__binary_operators[expr.operator.type](expr.operator, left, right)
 
+    def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
+        self.__evaluate(stmt.expression)
+
+    def visit_print_stmt(self, stmt: PrintStmt) -> None:
+        value: object = self.__evaluate(stmt.expression)
+        print(self.__stringify(value))
+
     def __evaluate(self, expr: Expr) -> object:
         return expr.accept(self)
+
+    def __execute(self, stmt: Stmt) -> None:
+        return stmt.accept(self)
 
     @staticmethod
     def __is_truthy(obj: object) -> bool:
