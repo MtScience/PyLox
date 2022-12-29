@@ -1,5 +1,6 @@
 from errors import ParseError
 from expr import *
+from stmt import *
 from tokenclass import *
 
 
@@ -20,11 +21,30 @@ class Parser:
              TokenType.RETURN
              ]
 
-    def parse(self) -> Expr | None:
-        try:
-            return self.__expression()
-        except ParseError:
-            return
+    def parse(self) -> list[Stmt]:
+        statements: list[Stmt] = []
+        while not self.__is_at_end():
+            statements.append(self.__statement())
+
+        return statements
+
+    def __statement(self) -> Stmt:
+        if self.__match(TokenType.PRINT):
+            return self.__print_statement()
+
+        return self.__expression_statement()
+
+    def __print_statement(self) -> PrintStmt:
+        value: Expr = self.__expression()
+        self.__consume(TokenType.SEMICOLON, "Expect ';' after value.")
+
+        return PrintStmt(value)
+
+    def __expression_statement(self) -> ExpressionStmt:
+        expr: Expr = self.__expression()
+        self.__consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+
+        return ExpressionStmt(expr)
 
     def __expression(self) -> Expr:
         # return self.__assignment()
@@ -80,14 +100,6 @@ class Parser:
 
         return expr
 
-    def __unary(self) -> Expr:
-        if self.__match(TokenType.BANG, TokenType.MINUS):
-            operator: Token = self.__previous()
-            right: Expr = self.__unary()
-            return UnaryExpr(operator, right)
-          
-        return self.__primary()
-
     def __primary(self) -> Expr:
         if self.__match(TokenType.FALSE):
             return LiteralExpr(False)
@@ -103,6 +115,15 @@ class Parser:
             return GroupingExpr(expr)
 
         self.__error(self.__peek(), "Expect expression.")
+
+    def __unary(self) -> Expr:
+        if self.__match(TokenType.BANG, TokenType.MINUS):
+            operator: Token = self.__previous()
+            right: Expr = self.__unary()
+            return UnaryExpr(operator, right)
+
+        # return self.__call()
+        return self.__primary()
 
     def __match(self, *types) -> bool:
         for typ in types:
