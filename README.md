@@ -22,4 +22,4 @@ PyLox is mostly a direct translation of Java code in the book to Python (made id
 
 ## Current state of the project
 
-Currently PyLox is a work in progress, supporting only expression evaluation (chapter 7 of the book completed).
+Currently PyLox is a work in progress, supporting only expression evaluation and expression and `print` statements (section 8.1 of the book completed).
