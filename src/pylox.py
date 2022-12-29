@@ -5,8 +5,7 @@ from expr import Expr
 from interpreter import Interpreter
 from parser import Parser
 from scanner import Scanner
-from tokenclass import Token
-from tokentype import TokenType
+from tokenclass import *
 
 
 class Lox:
