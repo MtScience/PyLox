@@ -65,9 +65,23 @@ class Parser:
         self.__consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
         return VarStmt(name, initializer)
 
+    def __assignment(self) -> Expr:
+        expr: Expr = self.__equality()
+
+        if self.__match(TokenType.EQUAL):
+            equals: Token = self.__previous()
+            value: Expr = self.__assignment()
+
+            if isinstance(expr, VariableExpr):
+                name: Token = expr.name
+                return AssignExpr(name, value)
+
+            self.__error(equals, "Invalid assignment target.")
+
+        return expr
+
     def __expression(self) -> Expr:
-        # return self.__assignment()
-        return self.__equality()
+        return self.__assignment()
 
     def __equality(self) -> Expr:
         expr: Expr = self.__comparison()
