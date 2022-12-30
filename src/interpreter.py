@@ -1,5 +1,6 @@
 from typing import SupportsFloat
 
+from environment import Environment
 from errors import LoxRuntimeError
 from expr import *
 from stmt import *
@@ -9,24 +10,25 @@ from tokenclass import *
 class Interpreter:
     def __init__(self, lox_main):
         self.__lox_main = lox_main
+        self.__environment: Environment = Environment()
 
-        self.__unary_operators: dict[TokenType, callable] = \
-            {TokenType.MINUS: self.__unary_minus_handler,
-             TokenType.BANG: lambda _, x: not self.__is_truthy(x)
-             }
-        self.__binary_operators: dict[TokenType, callable] = \
-            {TokenType.MINUS: self.__binary_minus_handler,
-             TokenType.PLUS: self.__binary_plus_handler,
-             TokenType.SLASH: self.__binary_slash_handler,
-             TokenType.STAR: self.__binary_star_handler,
-             TokenType.CARET: self.__binary_caret_handler,
-             TokenType.GREATER: self.__binary_gtr_handler,
-             TokenType.GREATER_EQUAL: self.__binary_geq_handler,
-             TokenType.LESS: self.__binary_less_handler,
-             TokenType.LESS_EQUAL: self.__binary_leq_handler,
-             TokenType.BANG_EQUAL: lambda _, l, r: not self.__is_equal(l, r),
-             TokenType.EQUAL_EQUAL: lambda _, l, r: self.__is_equal(l, r)
-             }
+        self.__unary_operators: dict[TokenType, callable] = {
+            TokenType.MINUS: self.__unary_minus_handler,
+            TokenType.BANG: lambda _, x: not self.__is_truthy(x)
+        }
+        self.__binary_operators: dict[TokenType, callable] = {
+            TokenType.MINUS: self.__binary_minus_handler,
+            TokenType.PLUS: self.__binary_plus_handler,
+            TokenType.SLASH: self.__binary_slash_handler,
+            TokenType.STAR: self.__binary_star_handler,
+            TokenType.CARET: self.__binary_caret_handler,
+            TokenType.GREATER: self.__binary_gtr_handler,
+            TokenType.GREATER_EQUAL: self.__binary_geq_handler,
+            TokenType.LESS: self.__binary_less_handler,
+            TokenType.LESS_EQUAL: self.__binary_leq_handler,
+            TokenType.BANG_EQUAL: lambda _, l, r: not self.__is_equal(l, r),
+            TokenType.EQUAL_EQUAL: lambda _, l, r: self.__is_equal(l, r)
+        }
 
     def interpret(self, statements: list[Stmt]) -> None:
         try:
@@ -42,16 +44,19 @@ class Interpreter:
     def visit_grouping_expr(self, expr: GroupingExpr) -> object:
         return self.__evaluate(expr.expr)
 
-    def visit_unary_expr(self, expr: UnaryExpr) -> object:
-        right: object = self.__evaluate(expr.right)
-
-        return self.__unary_operators[expr.operator.type](expr.operator, right)
-
     def visit_binary_expr(self, expr: BinaryExpr) -> object | bool:
         left: object = self.__evaluate(expr.left)
         right: object = self.__evaluate(expr.right)
 
         return self.__binary_operators[expr.operator.type](expr.operator, left, right)
+
+    def visit_unary_expr(self, expr: UnaryExpr) -> object:
+        right: object = self.__evaluate(expr.right)
+
+        return self.__unary_operators[expr.operator.type](expr.operator, right)
+
+    def visit_variable_expr(self, expr: VariableExpr) -> object:
+        return self.__environment.get(expr.name)
 
     def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
         self.__evaluate(stmt.expression)
@@ -59,6 +64,13 @@ class Interpreter:
     def visit_print_stmt(self, stmt: PrintStmt) -> None:
         value: object = self.__evaluate(stmt.expression)
         print(self.__stringify(value))
+
+    def visit_var_stmt(self, stmt: VarStmt) -> None:
+        value: object | None = None
+        if stmt.initializer is not None:
+            value = self.__evaluate(stmt.initializer)
+
+        self.__environment.define(stmt.name.lexeme, value)
 
     def __evaluate(self, expr: Expr) -> object:
         return expr.accept(self)
