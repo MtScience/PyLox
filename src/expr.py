@@ -8,6 +8,15 @@ class Expr(ABC):
     def accept(self, visitor): ...
 
 
+class AssignExpr(Expr):
+    def __init__(self, name: Token, value: Expr):
+        self.name: Token = name
+        self.value: Expr = value
+
+    def accept(self, visitor: Expr):
+        return visitor.visit_assign_expr(self)
+
+
 class BinaryExpr(Expr):
     def __init__(self, left: Expr, operator: Token, right: Expr):
         self.left: Expr = left
@@ -51,4 +60,4 @@ class VariableExpr(Expr):
         return visitor.visit_variable_expr(self)
 
 
-__all__ = ["Expr", "BinaryExpr", "GroupingExpr", "LiteralExpr", "UnaryExpr", "VariableExpr"]
+__all__ = ["Expr", "AssignExpr", "BinaryExpr", "GroupingExpr", "LiteralExpr", "UnaryExpr", "VariableExpr"]
