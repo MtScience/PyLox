@@ -58,6 +58,11 @@ class Interpreter:
     def visit_variable_expr(self, expr: VariableExpr) -> object:
         return self.__environment.get(expr.name)
 
+    def visit_assign_expr(self, expr: AssignExpr) -> object:
+        value: object = self.__evaluate(expr.value)
+        self.__environment.assign(expr.name, value)
+        return value
+
     def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
         self.__evaluate(stmt.expression)
 
