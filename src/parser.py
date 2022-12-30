@@ -10,21 +10,21 @@ class Parser:
         self.__current: int = 0
         self.__tokens: list[Token] = tokens
 
-        self.__synchronization_tokens: list[TokenType] = \
-            [TokenType.CLASS,
-             TokenType.FUN,
-             TokenType.VAR,
-             TokenType.FOR,
-             TokenType.IF,
-             TokenType.WHILE,
-             TokenType.PRINT,
-             TokenType.RETURN
-             ]
+        self.__synchronization_tokens: list[TokenType] = [
+            TokenType.CLASS,
+            TokenType.FUN,
+            TokenType.VAR,
+            TokenType.FOR,
+            TokenType.IF,
+            TokenType.WHILE,
+            TokenType.PRINT,
+            TokenType.RETURN
+        ]
 
     def parse(self) -> list[Stmt]:
         statements: list[Stmt] = []
         while not self.__is_at_end():
-            statements.append(self.__statement())
+            statements.append(self.__declaration())
 
         return statements
 
@@ -45,6 +45,25 @@ class Parser:
         self.__consume(TokenType.SEMICOLON, "Expect ';' after expression.")
 
         return ExpressionStmt(expr)
+
+    def __declaration(self) -> Stmt | None:
+        try:
+            if self.__match(TokenType.VAR):
+                return self.__var_declaration()
+            return self.__statement()
+        except ParseError:
+            self.__synchronize()
+            return
+
+    def __var_declaration(self) -> VarStmt:
+        name: Token = self.__consume(TokenType.IDENTIFIER, "Expect a variable name.")
+
+        initializer: Expr | None = None
+        if self.__match(TokenType.EQUAL):
+            initializer = self.__expression()
+
+        self.__consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+        return VarStmt(name, initializer)
 
     def __expression(self) -> Expr:
         # return self.__assignment()
@@ -109,6 +128,8 @@ class Parser:
             return LiteralExpr(None)
         if self.__match(TokenType.NUMBER, TokenType.STRING):
             return LiteralExpr(self.__previous().literal)
+        if self.__match(TokenType.IDENTIFIER):
+            return VariableExpr(self.__previous())
         if self.__match(TokenType.LEFT_PAREN):
             expr: Expr = self.__expression()
             self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
