@@ -25,4 +25,13 @@ class PrintStmt(Stmt):
         return visitor.visit_print_stmt(self)
 
 
-__all__ = ["Stmt", "ExpressionStmt", "PrintStmt"]
+class VarStmt(Stmt):
+    def __init__(self, name: Token, initializer: Expr):
+        self.name: Token = name
+        self.initializer: Expr = initializer
+
+    def accept(self, visitor: Stmt):
+        return visitor.visit_var_stmt(self)
+
+
+__all__ = ["Stmt", "ExpressionStmt", "PrintStmt", "VarStmt"]
