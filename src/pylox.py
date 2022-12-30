@@ -1,7 +1,7 @@
 import sys
 
 from errors import LoxRuntimeError
-from interpreter import Interpreter
+from interpreter import *
 from parser import Parser
 from scanner import Scanner
 from stmt import Stmt
@@ -29,7 +29,7 @@ class Lox:
         print(f"[line {ln}] Error{where}: {msg}", file=sys.stderr)
         self.had_error = True
 
-    def __run(self, source: str) -> None:
+    def __run(self, source: str, mode: OpMode) -> None:
         scanner: Scanner = Scanner(source, self)
         tokens: list[Token] = scanner.scan_tokens()
 
@@ -39,7 +39,7 @@ class Lox:
         if self.had_error:
             return
 
-        self.__interpreter.interpret(statements)
+        self.__interpreter.interpret(statements, mode)
 
     def run_repl(self) -> None:
         while True:
@@ -48,13 +48,13 @@ class Lox:
             except EOFError:
                 break
 
-            self.__run(line)
+            self.__run(line, OpMode.INTERACTIVE)
 
     def run_file(self, path: str) -> None:
         with open(path, "r") as file:
             code = file.read()
 
-        self.__run(code)
+        self.__run(code, OpMode.SCRIPT)
 
         if self.had_error:
             sys.exit(65)
