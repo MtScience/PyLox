@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is my Python 3.10 reimplementation of jlox as described in the awesome book [“Crafting Interpreters”](https://craftinginterpreters.com/) by Robert Nystrom. Made it to better understand the principles behind language implementation.
+This is my Python 3.10 reimplementation of jlox as described in the awesome book [“Crafting Interpreters”](https://craftinginterpreters.com/) by Robert Nystrom. Made it to better understand the principles behind language implementation, since I'm not particularly comfortable with Java.
 
 ## Running
 
@@ -22,4 +22,4 @@ PyLox is mostly a direct translation of Java code in the book to Python (made id
 
 ## Current state of the project
 
-Currently PyLox is a work in progress, supporting only expression evaluation (chapter 7 of the book completed).
+Currently PyLox is a work in progress, supporting only expression evaluation and statements up until global variables (section 8.3 of the book completed).

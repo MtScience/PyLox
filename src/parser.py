@@ -1,5 +1,6 @@
 from errors import ParseError
 from expr import *
+from stmt import *
 from tokenclass import *
 
 
@@ -9,22 +10,60 @@ class Parser:
         self.__current: int = 0
         self.__tokens: list[Token] = tokens
 
-        self.__synchronization_tokens: list[TokenType] = \
-            [TokenType.CLASS,
-             TokenType.FUN,
-             TokenType.VAR,
-             TokenType.FOR,
-             TokenType.IF,
-             TokenType.WHILE,
-             TokenType.PRINT,
-             TokenType.RETURN
-             ]
+        self.__synchronization_tokens: list[TokenType] = [
+            TokenType.CLASS,
+            TokenType.FUN,
+            TokenType.VAR,
+            TokenType.FOR,
+            TokenType.IF,
+            TokenType.WHILE,
+            TokenType.PRINT,
+            TokenType.RETURN
+        ]
 
-    def parse(self) -> Expr | None:
+    def parse(self) -> list[Stmt]:
+        statements: list[Stmt] = []
+        while not self.__is_at_end():
+            statements.append(self.__declaration())
+
+        return statements
+
+    def __statement(self) -> Stmt:
+        if self.__match(TokenType.PRINT):
+            return self.__print_statement()
+
+        return self.__expression_statement()
+
+    def __print_statement(self) -> PrintStmt:
+        value: Expr = self.__expression()
+        self.__consume(TokenType.SEMICOLON, "Expect ';' after value.")
+
+        return PrintStmt(value)
+
+    def __expression_statement(self) -> ExpressionStmt:
+        expr: Expr = self.__expression()
+        self.__consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+
+        return ExpressionStmt(expr)
+
+    def __declaration(self) -> Stmt | None:
         try:
-            return self.__expression()
+            if self.__match(TokenType.VAR):
+                return self.__var_declaration()
+            return self.__statement()
         except ParseError:
+            self.__synchronize()
             return
+
+    def __var_declaration(self) -> VarStmt:
+        name: Token = self.__consume(TokenType.IDENTIFIER, "Expect a variable name.")
+
+        initializer: Expr | None = None
+        if self.__match(TokenType.EQUAL):
+            initializer = self.__expression()
+
+        self.__consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+        return VarStmt(name, initializer)
 
     def __expression(self) -> Expr:
         # return self.__assignment()
@@ -80,14 +119,6 @@ class Parser:
 
         return expr
 
-    def __unary(self) -> Expr:
-        if self.__match(TokenType.BANG, TokenType.MINUS):
-            operator: Token = self.__previous()
-            right: Expr = self.__unary()
-            return UnaryExpr(operator, right)
-          
-        return self.__primary()
-
     def __primary(self) -> Expr:
         if self.__match(TokenType.FALSE):
             return LiteralExpr(False)
@@ -97,12 +128,23 @@ class Parser:
             return LiteralExpr(None)
         if self.__match(TokenType.NUMBER, TokenType.STRING):
             return LiteralExpr(self.__previous().literal)
+        if self.__match(TokenType.IDENTIFIER):
+            return VariableExpr(self.__previous())
         if self.__match(TokenType.LEFT_PAREN):
             expr: Expr = self.__expression()
             self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return GroupingExpr(expr)
 
         self.__error(self.__peek(), "Expect expression.")
+
+    def __unary(self) -> Expr:
+        if self.__match(TokenType.BANG, TokenType.MINUS):
+            operator: Token = self.__previous()
+            right: Expr = self.__unary()
+            return UnaryExpr(operator, right)
+
+        # return self.__call()
+        return self.__primary()
 
     def __match(self, *types) -> bool:
         for typ in types:
