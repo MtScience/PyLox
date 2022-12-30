@@ -43,4 +43,12 @@ class UnaryExpr(Expr):
         return visitor.visit_unary_expr(self)
 
 
-__all__ = ["Expr", "BinaryExpr", "GroupingExpr", "LiteralExpr", "UnaryExpr"]
+class VariableExpr(Expr):
+    def __init__(self, name: Token):
+        self.name: Token = name
+
+    def accept(self, visitor: Expr):
+        return visitor.visit_variable_expr(self)
+
+
+__all__ = ["Expr", "BinaryExpr", "GroupingExpr", "LiteralExpr", "UnaryExpr", "VariableExpr"]
