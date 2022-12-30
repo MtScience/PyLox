@@ -31,6 +31,8 @@ class Parser:
     def __statement(self) -> Stmt:
         if self.__match(TokenType.PRINT):
             return self.__print_statement()
+        if self.__match(TokenType.LEFT_BRACE):
+            return BlockStmt(self.__block())
 
         return self.__expression_statement()
 
@@ -79,6 +81,15 @@ class Parser:
             self.__error(equals, "Invalid assignment target.")
 
         return expr
+
+    def __block(self) -> list[Stmt]:
+        statements: list[Stmt] = []
+
+        while not (self.__check(TokenType.RIGHT_BRACE) or self.__is_at_end()):
+            statements.append(self.__declaration())
+
+        self.__consume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
+        return statements
 
     def __expression(self) -> Expr:
         return self.__assignment()
