@@ -63,6 +63,9 @@ class Interpreter:
         self.__environment.assign(expr.name, value)
         return value
 
+    def visit_block_stmt(self, stmt: BlockStmt) -> None:
+        self.execute_block(stmt.statements, Environment(self.__environment))
+
     def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
         self.__evaluate(stmt.expression)
 
@@ -82,6 +85,15 @@ class Interpreter:
 
     def __execute(self, stmt: Stmt) -> None:
         return stmt.accept(self)
+
+    def execute_block(self, statements: list[Stmt], environment: Environment) -> None:
+        previous: Environment = self.__environment
+        try:
+            self.__environment = environment
+            for statement in statements:
+                self.__execute(statement)
+        finally:
+            self.__environment = previous
 
     @staticmethod
     def __is_truthy(obj: object) -> bool:
