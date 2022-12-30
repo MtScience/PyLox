@@ -9,6 +9,14 @@ class Stmt(ABC):
     def accept(self, visitor): ...
 
 
+class BlockStmt(Stmt):
+    def __init__(self, statements: list[Stmt]):
+        self.statements: list[Stmt] = statements
+
+    def accept(self, visitor: Stmt):
+        return visitor.visit_block_stmt(self)
+
+
 class ExpressionStmt(Stmt):
     def __init__(self, expression: Expr):
         self.expression: Expr = expression
@@ -34,4 +42,4 @@ class VarStmt(Stmt):
         return visitor.visit_var_stmt(self)
 
 
-__all__ = ["Stmt", "ExpressionStmt", "PrintStmt", "VarStmt"]
+__all__ = ["Stmt", "BlockStmt", "ExpressionStmt", "PrintStmt", "VarStmt"]
