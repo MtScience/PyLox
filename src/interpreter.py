@@ -1,3 +1,4 @@
+from enum import Enum, auto
 from typing import SupportsFloat
 
 from environment import Environment
@@ -5,6 +6,11 @@ from errors import LoxRuntimeError
 from expr import *
 from stmt import *
 from tokenclass import *
+
+
+class OpMode(Enum):
+    SCRIPT = auto()
+    INTERACTIVE = auto()
 
 
 class Interpreter:
@@ -30,10 +36,10 @@ class Interpreter:
             TokenType.EQUAL_EQUAL: lambda _, l, r: self.__is_equal(l, r)
         }
 
-    def interpret(self, statements: list[Stmt]) -> None:
+    def interpret(self, statements: list[Stmt], mode: OpMode) -> None:
         try:
             for statement in statements:
-                self.__execute(statement)
+                self.__mode_execute(statement, mode)
         except LoxRuntimeError as err:
             self.__lox_main.runtime_error(err)
 
@@ -79,6 +85,13 @@ class Interpreter:
             value = self.__evaluate(stmt.initializer)
 
         self.__environment.define(stmt.name.lexeme, value)
+
+    def __mode_execute(self, stmt: Stmt, mode: OpMode) -> None:
+        if mode == OpMode.INTERACTIVE and isinstance(stmt, ExpressionStmt):
+            value: object = self.__evaluate(stmt.expression)
+            print(self.__stringify(value))
+        else:
+            self.__execute(stmt)
 
     def __evaluate(self, expr: Expr) -> object:
         return expr.accept(self)
@@ -190,4 +203,4 @@ class Interpreter:
         return -float(x)
 
 
-__all__ = "Interpreter"
+__all__ = ["Interpreter", "OpMode"]
