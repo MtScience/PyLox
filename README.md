@@ -22,4 +22,4 @@ PyLox is mostly a direct translation of Java code in the book to Python (made id
 
 ## Current state of the project
 
-Currently PyLox is a work in progress, supporting everything up to and including `if` statements (section 9.2 of the book completed).
+Currently PyLox is a work in progress, supporting everything up to and including `if` statements and logical operators (section 9.3 of the book completed).
