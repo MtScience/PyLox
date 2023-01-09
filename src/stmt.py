@@ -17,6 +17,9 @@ class StmtVisitor(ABC):
     def visit_expression_stmt(self, stmt: Stmt): ...
 
     @abstractmethod
+    def visit_if_stmt(self, stmt: Stmt): ...
+
+    @abstractmethod
     def visit_print_stmt(self, stmt: Stmt): ...
 
     @abstractmethod
@@ -39,6 +42,16 @@ class ExpressionStmt(Stmt):
         return visitor.visit_expression_stmt(self)
 
 
+class IfStmt(Stmt):
+    def __init__(self, condition: Expr, if_clause: Stmt, else_clause: Stmt | None):
+        self.condition: Expr = condition
+        self.if_clause: Stmt = if_clause
+        self.else_clause: Stmt | None = else_clause
+
+    def accept(self, visitor: StmtVisitor):
+        return visitor.visit_if_stmt(self)
+
+
 class PrintStmt(Stmt):
     def __init__(self, expression: Expr):
         self.expression: Expr = expression
@@ -56,4 +69,4 @@ class VarStmt(Stmt):
         return visitor.visit_var_stmt(self)
 
 
-__all__ = ["Stmt", "StmtVisitor", "BlockStmt", "ExpressionStmt", "PrintStmt", "VarStmt"]
+__all__ = ["Stmt", "StmtVisitor", "BlockStmt", "ExpressionStmt", "IfStmt", "PrintStmt", "VarStmt"]
