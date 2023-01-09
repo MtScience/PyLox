@@ -18,6 +18,7 @@ class ExprVisitor(ABC):
     @abstractmethod
     def visit_grouping_expr(self, expr: Expr): ...
 
+    @staticmethod
     @abstractmethod
     def visit_literal_expr(self, expr: Expr): ...
 
