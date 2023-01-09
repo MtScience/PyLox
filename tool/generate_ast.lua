@@ -7,7 +7,7 @@ function define_type(file, base_name, class_name, fields)
         file:write("        self.", field, " = ", val, "\n")
     end
 
-    file:write("\n    def accept(self, visitor: ", base_name .. "Visitor", "):\n")
+    file:write("\n    def accept(self, visitor: ", base_name, "Visitor", "):\n")
     file:write("        return visitor.visit_", class_name:lower(), "_", base_name:lower(), "(self)\n")
     file:write "\n\n"
 end
@@ -35,10 +35,10 @@ function define_ast(out_dir, base_name, exprtypes, imports)
     -- Actual writing: imports and main class
     file:write "from abc import ABC, abstractmethod\n\n"
     for _, import in ipairs(imports) do
-        file:write("from " .. import.from .. " import " .. import.what .. "\n")
+        file:write("from ", import.from, " import ", import.what, "\n")
     end
     file:write "\n\n"
-    file:write("class " .. base_name .. "(ABC):\n")
+    file:write("class ", base_name, "(ABC):\n")
     file:write "    @abstractmethod\n"
     file:write "    def accept(self, visitor): ...\n\n\n"
 
@@ -86,7 +86,7 @@ stmts = {"Block      : statements: list[Stmt]",
          "Print      : expression: Expr",
          --"Return     : keyword: Token, value: Expr | None",
          "Var        : name: Token, initializer: Expr",
-         --"While      : condition: Expr, body: Stmt",
+         "While      : condition: Expr, body: Stmt",
          --"Class      : name: Token, methods: list[FunctionStmt]"
 }
 define_ast("../src", "Stmt", stmts, {{from = "expr", what = "Expr"}, {from = "tokenclass", what = "Token"}})
