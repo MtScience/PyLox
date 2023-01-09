@@ -46,7 +46,7 @@ function define_ast(out_dir, base_name, exprtypes, imports)
     file:write("class " .. base_name .. "Visitor(ABC):\n")
     local types = {base_name}
     for _, exprtype in ipairs(exprtypes) do
-        local class_name = string.match(exprtype, "(%a+)%s+:%s+[%g%s]+")
+        local class_name = exprtype:match "(%a+)%s+:%s+[%g%s]+"
         types[#types + 1] = class_name .. base_name
         define_visitor(file, base_name, class_name)
     end
@@ -82,7 +82,7 @@ define_ast("../src", "Expr", exprs, {{from = "tokenclass", what = "Token"}})
 stmts = {"Block      : statements: list[Stmt]",
          "Expression : expression: Expr",
          --"Function   : name: Token, params: list[Token], body: list[Stmt]",
-         --"If         : condition: Expr, if_clause: Stmt, else_clause: Stmt | None",
+         "If         : condition: Expr, if_clause: Stmt, else_clause: Stmt | None",
          "Print      : expression: Expr",
          --"Return     : keyword: Token, value: Expr | None",
          "Var        : name: Token, initializer: Expr",
