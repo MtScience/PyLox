@@ -46,6 +46,7 @@ class Lox:
             try:
                 line = input("> ")
             except EOFError:
+                print()
                 break
 
             self.__run(line, OpMode.INTERACTIVE)
