@@ -82,7 +82,7 @@ class Parser:
         return VarStmt(name, initializer)
 
     def __assignment(self) -> Expr:
-        expr: Expr = self.__equality()
+        expr: Expr = self.__or()
 
         if self.__match(TokenType.EQUAL):
             equals: Token = self.__previous()
@@ -104,6 +104,26 @@ class Parser:
 
         self.__consume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
         return statements
+
+    def __or(self) -> Expr:
+        expr: Expr = self.__and()
+
+        while self.__match(TokenType.OR):
+            operator: Token = self.__previous()
+            right: Expr = self.__and()
+            expr = LogicalExpr(expr, operator, right)
+
+        return expr
+
+    def __and(self) -> Expr:
+        expr: Expr = self.__equality()
+
+        while self.__match(TokenType.AND):
+            operator: Token = self.__previous()
+            right: Expr = self.__equality()
+            expr = LogicalExpr(expr, operator, right)
+
+        return expr
 
     def __expression(self) -> Expr:
         return self.__assignment()
