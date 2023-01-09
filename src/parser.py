@@ -29,6 +29,8 @@ class Parser:
         return statements
 
     def __statement(self) -> Stmt:
+        if self.__match(TokenType.IF):
+            return self.__if_statement()
         if self.__match(TokenType.PRINT):
             return self.__print_statement()
         if self.__match(TokenType.LEFT_BRACE):
@@ -47,6 +49,18 @@ class Parser:
         self.__consume(TokenType.SEMICOLON, "Expect ';' after expression.")
 
         return ExpressionStmt(expr)
+
+    def __if_statement(self) -> IfStmt:
+        self.__consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.")
+        condition: Expr = self.__expression()
+        self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.")
+
+        if_clause: Stmt = self.__statement()
+        else_clause: Stmt | None = None
+        if self.__match(TokenType.ELSE):
+            else_clause = self.__statement()
+
+        return IfStmt(condition, if_clause, else_clause)
 
     def __declaration(self) -> Stmt | None:
         try:
