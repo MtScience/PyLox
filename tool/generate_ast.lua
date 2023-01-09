@@ -68,7 +68,7 @@ end
 
 exprs = {"Assign   : name: Token, value: Expr",
          "Binary   : left: Expr, operator: Token, right: Expr",
-         --"Call     : callee: Expr, paren: Token, arguments: list[Expr]",
+         "Call     : callee: Expr, paren: Token, arguments: list[Expr]",
          --"Get      : obj: Expr, name: Token",
          "Grouping : expr: Expr",
          "Literal  : value: object",
