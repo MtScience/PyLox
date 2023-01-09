@@ -13,7 +13,7 @@ class OpMode(Enum):
     INTERACTIVE = auto()
 
 
-class Interpreter:
+class Interpreter(ExprVisitor, StmtVisitor):
     def __init__(self, lox_main):
         self.__lox_main = lox_main
         self.__environment: Environment = Environment()
