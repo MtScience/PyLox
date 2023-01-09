@@ -33,6 +33,8 @@ class Parser:
             return self.__if_statement()
         if self.__match(TokenType.PRINT):
             return self.__print_statement()
+        if self.__match(TokenType.WHILE):
+            return self.__while_statement()
         if self.__match(TokenType.LEFT_BRACE):
             return BlockStmt(self.__block())
 
@@ -61,6 +63,14 @@ class Parser:
             else_clause = self.__statement()
 
         return IfStmt(condition, if_clause, else_clause)
+
+    def __while_statement(self) -> WhileStmt:
+        self.__consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
+        condition: Expr = self.__expression()
+        self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.")
+        body: Stmt = self.__statement()
+
+        return WhileStmt(condition, body)
 
     def __declaration(self) -> Stmt | None:
         try:
