@@ -245,14 +245,40 @@ class Parser:
 
         self.__error(self.__peek(), "Expect expression.")
 
+    def __call(self) -> Expr:
+        expr: Expr = self.__primary()
+
+        while True:
+            if self.__match(TokenType.LEFT_PAREN):
+                expr = self.__finish_call(expr)
+            else:
+                break
+
+        return expr
+
+    def __finish_call(self, callee: Expr) -> Expr:
+        arguments: list[Expr] = []
+
+        if not self.__check(TokenType.RIGHT_PAREN):
+            while True:
+                if len(arguments) >= 255:
+                    self.__lox_main.token_error(self.__peek(), "Can't have more than 255 arguments.")
+
+                arguments.append(self.__expression())
+                if not self.__match(TokenType.COMMA):
+                    break
+
+        paren = self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
+
+        return CallExpr(callee, paren, arguments)
+
     def __unary(self) -> Expr:
         if self.__match(TokenType.BANG, TokenType.MINUS):
             operator: Token = self.__previous()
             right: Expr = self.__unary()
             return UnaryExpr(operator, right)
 
-        # return self.__call()
-        return self.__primary()
+        return self.__call()
 
     def __match(self, *types) -> bool:
         for typ in types:
