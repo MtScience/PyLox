@@ -16,11 +16,14 @@ class ExprVisitor(ABC):
     def visit_binary_expr(self, expr: Expr): ...
 
     @abstractmethod
+    def visit_call_expr(self, expr: Expr): ...
+
+    @abstractmethod
     def visit_grouping_expr(self, expr: Expr): ...
 
     @staticmethod
     @abstractmethod
-    def visit_literal_expr(self, expr: Expr): ...
+    def visit_literal_expr(expr: Expr): ...
 
     @abstractmethod
     def visit_logical_expr(self, expr: Expr): ...
@@ -49,6 +52,16 @@ class BinaryExpr(Expr):
 
     def accept(self, visitor: ExprVisitor):
         return visitor.visit_binary_expr(self)
+
+
+class CallExpr(Expr):
+    def __init__(self, callee: Expr, paren: Token, arguments: list[Expr]):
+        self.callee: Expr = callee
+        self.paren: Token = paren
+        self.arguments: list[Expr] = arguments
+
+    def accept(self, visitor: ExprVisitor):
+        return visitor.visit_call_expr(self)
 
 
 class GroupingExpr(Expr):
@@ -94,4 +107,4 @@ class VariableExpr(Expr):
         return visitor.visit_variable_expr(self)
 
 
-__all__ = ["Expr", "ExprVisitor", "AssignExpr", "BinaryExpr", "GroupingExpr", "LiteralExpr", "LogicalExpr", "UnaryExpr", "VariableExpr"]
+__all__ = ["Expr", "ExprVisitor", "AssignExpr", "BinaryExpr", "CallExpr", "GroupingExpr", "LiteralExpr", "LogicalExpr", "UnaryExpr", "VariableExpr"]
