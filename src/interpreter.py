@@ -4,6 +4,8 @@ from typing import SupportsFloat
 from environment import Environment
 from errors import LoxRuntimeError
 from expr import *
+from lox_callable import LoxCallable
+from lox_native import *
 from stmt import *
 from tokenclass import *
 
@@ -16,7 +18,8 @@ class OpMode(Enum):
 class Interpreter(ExprVisitor, StmtVisitor):
     def __init__(self, lox_main):
         self.__lox_main = lox_main
-        self.__environment: Environment = Environment()
+        self.globals: Environment = Environment()
+        self.__environment: Environment = self.globals
 
         self.__unary_operators: dict[TokenType, callable] = {
             TokenType.MINUS: self.__unary_minus_handler,
@@ -35,6 +38,8 @@ class Interpreter(ExprVisitor, StmtVisitor):
             TokenType.BANG_EQUAL: lambda _, l, r: not self.__is_equal(l, r),
             TokenType.EQUAL_EQUAL: lambda _, l, r: self.__is_equal(l, r)
         }
+
+        self.__define_natives()
 
     def interpret(self, statements: list[Stmt], mode: OpMode) -> None:
         try:
@@ -66,6 +71,22 @@ class Interpreter(ExprVisitor, StmtVisitor):
         right: object = self.__evaluate(expr.right)
 
         return self.__binary_operators[expr.operator.type](expr.operator, left, right)
+
+    def visit_call_expr(self, expr: CallExpr) -> object:
+        callee: object = self.__evaluate(expr.callee)
+
+        arguments: list[object] = []
+        for argument in expr.arguments:
+            arguments.append(self.__evaluate(argument))
+
+        if not isinstance(callee, LoxCallable):
+            raise LoxRuntimeError(expr.paren, "Can only call functions and classes.")
+
+        function: LoxCallable = callee
+        if (arg_no := len(arguments)) != (arity := function.arity()):
+            raise LoxRuntimeError(expr.paren, f"Expected {arity} arguments but got {arg_no}.")
+
+        return function.call(self, arguments)
 
     def visit_unary_expr(self, expr: UnaryExpr) -> object:
         right: object = self.__evaluate(expr.right)
@@ -177,6 +198,8 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         return str(obj)
 
+    # Operator handlers
+
     @staticmethod
     def __binary_plus_handler(operator: Token, left: object, right: object) -> float | str:
         if isinstance(left, float) and isinstance(right, float):
@@ -222,6 +245,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def __unary_minus_handler(self, operator: Token, x: SupportsFloat) -> float:
         self.__check_number_operand(operator, x)
         return -float(x)
+
+    # Method to define native Lox functions (so as to not pollute the __init__)
+
+    def __define_natives(self) -> None:
+        self.globals.define("clock", Clock())
 
 
 __all__ = ["Interpreter", "OpMode"]
