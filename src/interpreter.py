@@ -103,6 +103,10 @@ class Interpreter(ExprVisitor, StmtVisitor):
         elif stmt.else_clause is not None:
             self.__execute(stmt.else_clause)
 
+    def visit_while_stmt(self, stmt: WhileStmt) -> None:
+        while self.__is_truthy(self.__evaluate(stmt.condition)):
+            self.__execute(stmt.body)
+
     def __mode_execute(self, stmt: Stmt, mode: OpMode) -> None:
         if mode == OpMode.INTERACTIVE and isinstance(stmt, ExpressionStmt):
             value: object = self.__evaluate(stmt.expression)
