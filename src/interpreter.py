@@ -86,6 +86,12 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         self.__environment.define(stmt.name.lexeme, value)
 
+    def visit_if_stmt(self, stmt: IfStmt) -> None:
+        if self.__is_truthy(self.__evaluate(stmt.condition)):
+            self.__execute(stmt.if_clause)
+        elif stmt.else_clause is not None:
+            self.__execute(stmt.else_clause)
+
     def __mode_execute(self, stmt: Stmt, mode: OpMode) -> None:
         if mode == OpMode.INTERACTIVE and isinstance(stmt, ExpressionStmt):
             value: object = self.__evaluate(stmt.expression)
