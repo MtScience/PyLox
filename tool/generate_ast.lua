@@ -84,7 +84,7 @@ stmts = {"Block      : statements: list[Stmt]",
          "Function   : name: Token, params: list[Token], body: list[Stmt]",
          "If         : condition: Expr, if_clause: Stmt, else_clause: Stmt | None",
          "Print      : expression: Expr",
-         --"Return     : keyword: Token, value: Expr | None",
+         "Return     : keyword: Token, value: Expr | None",
          "Var        : name: Token, initializer: Expr",
          "While      : condition: Expr, body: Stmt",
          --"Class      : name: Token, methods: list[FunctionStmt]"
