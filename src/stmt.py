@@ -17,6 +17,9 @@ class StmtVisitor(ABC):
     def visit_expression_stmt(self, stmt: Stmt): ...
 
     @abstractmethod
+    def visit_function_stmt(self, stmt: Stmt): ...
+
+    @abstractmethod
     def visit_if_stmt(self, stmt: Stmt): ...
 
     @abstractmethod
@@ -43,6 +46,16 @@ class ExpressionStmt(Stmt):
 
     def accept(self, visitor: StmtVisitor):
         return visitor.visit_expression_stmt(self)
+
+
+class FunctionStmt(Stmt):
+    def __init__(self, name: Token, params: list[Token], body: list[Stmt]):
+        self.name: Token = name
+        self.params: list[Token] = params
+        self.body: list[Stmt] = body
+
+    def accept(self, visitor: StmtVisitor):
+        return visitor.visit_function_stmt(self)
 
 
 class IfStmt(Stmt):
@@ -81,4 +94,4 @@ class WhileStmt(Stmt):
         return visitor.visit_while_stmt(self)
 
 
-__all__ = ["Stmt", "StmtVisitor", "BlockStmt", "ExpressionStmt", "IfStmt", "PrintStmt", "VarStmt", "WhileStmt"]
+__all__ = ["Stmt", "StmtVisitor", "BlockStmt", "ExpressionStmt", "FunctionStmt", "IfStmt", "PrintStmt", "VarStmt", "WhileStmt"]
