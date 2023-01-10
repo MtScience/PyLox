@@ -7,6 +7,7 @@ from expr import *
 from lox_callable import LoxCallable
 from lox_function import LoxFunction
 from lox_native import *
+from return_class import Return
 from stmt import *
 from tokenclass import *
 
@@ -132,6 +133,13 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def visit_function_stmt(self, stmt: FunctionStmt) -> None:
         function: LoxFunction = LoxFunction(stmt)
         self.__environment.define(stmt.name.lexeme, function)
+
+    def visit_return_stmt(self, stmt: ReturnStmt) -> None:
+        value: object | None = None
+        if stmt.value is not None:
+            value = self.__evaluate(stmt.value)
+
+        raise Return(value)
 
     def __mode_execute(self, stmt: Stmt, mode: OpMode) -> None:
         if mode == OpMode.INTERACTIVE and isinstance(stmt, ExpressionStmt):
