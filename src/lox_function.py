@@ -5,11 +5,12 @@ from stmt import FunctionStmt
 
 
 class LoxFunction(LoxCallable):
-    def __init__(self, declaration: FunctionStmt):
-        self.__declaration = declaration
+    def __init__(self, declaration: FunctionStmt, closure: Environment):
+        self.__declaration: FunctionStmt = declaration
+        self.__closure: Environment = closure
 
     def call(self, interpreter, arguments: list[object]) -> object:
-        environment: Environment = Environment(interpreter.globals)
+        environment: Environment = Environment(self.__closure)
 
         # A tiny sprinkle of Haskell-like functional programming:
         for param, argument in zip(self.__declaration.params, arguments):
