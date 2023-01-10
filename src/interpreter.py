@@ -5,6 +5,7 @@ from environment import Environment
 from errors import LoxRuntimeError
 from expr import *
 from lox_callable import LoxCallable
+from lox_function import LoxFunction
 from lox_native import *
 from stmt import *
 from tokenclass import *
@@ -127,6 +128,10 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def visit_while_stmt(self, stmt: WhileStmt) -> None:
         while self.__is_truthy(self.__evaluate(stmt.condition)):
             self.__execute(stmt.body)
+
+    def visit_function_stmt(self, stmt: FunctionStmt) -> None:
+        function: LoxFunction = LoxFunction(stmt)
+        self.__environment.define(stmt.name.lexeme, function)
 
     def __mode_execute(self, stmt: Stmt, mode: OpMode) -> None:
         if mode == OpMode.INTERACTIVE and isinstance(stmt, ExpressionStmt):
