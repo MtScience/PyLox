@@ -81,7 +81,7 @@ define_ast("../src", "Expr", exprs, {{from = "tokenclass", what = "Token"}})
 
 stmts = {"Block      : statements: list[Stmt]",
          "Expression : expression: Expr",
-         --"Function   : name: Token, params: list[Token], body: list[Stmt]",
+         "Function   : name: Token, params: list[Token], body: list[Stmt]",
          "If         : condition: Expr, if_clause: Stmt, else_clause: Stmt | None",
          "Print      : expression: Expr",
          --"Return     : keyword: Token, value: Expr | None",
