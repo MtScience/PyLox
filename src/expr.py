@@ -65,8 +65,8 @@ class CallExpr(Expr):
 
 
 class GroupingExpr(Expr):
-    def __init__(self, expr: Expr):
-        self.expr: Expr = expr
+    def __init__(self, expression: Expr):
+        self.expression: Expr = expression
 
     def accept(self, visitor: ExprVisitor):
         return visitor.visit_grouping_expr(self)
