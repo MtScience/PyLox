@@ -57,6 +57,7 @@ class Lox:
                 break
 
             self.__run(line, OpMode.INTERACTIVE)
+            self.had_error = False  # Unset error flag to allow for printing after errors in REPL
 
     def run_file(self, path: str) -> None:
         with open(path, "r") as file:
