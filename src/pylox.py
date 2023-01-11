@@ -3,6 +3,7 @@ import sys
 from errors import LoxRuntimeError
 from interpreter import *
 from parser import Parser
+from resolver import Resolver
 from scanner import Scanner
 from stmt import Stmt
 from tokenclass import *
@@ -35,6 +36,12 @@ class Lox:
 
         parser: Parser = Parser(tokens, self)
         statements: list[Stmt] = parser.parse()
+
+        if self.had_error:
+            return
+
+        resolver: Resolver = Resolver(self.__interpreter, self)
+        resolver.resolve(statements)
 
         if self.had_error:
             return
