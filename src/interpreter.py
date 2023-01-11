@@ -22,6 +22,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
         self.__lox_main = lox_main
         self.globals: Environment = Environment()
         self.__environment: Environment = self.globals
+        self.__locals: dict[Expr, int] = {}
 
         self.__unary_operators: dict[TokenType, callable] = {
             TokenType.MINUS: self.__unary_minus_handler,
@@ -50,23 +51,16 @@ class Interpreter(ExprVisitor, StmtVisitor):
         except LoxRuntimeError as err:
             self.__lox_main.runtime_error(err)
 
-    @staticmethod
-    def visit_literal_expr(expr: LiteralExpr) -> object:
-        return expr.value
+    def visit_assign_expr(self, expr: AssignExpr) -> object:
+        value: object = self.__evaluate(expr.value)
 
-    def visit_logical_expr(self, expr: LogicalExpr) -> object:
-        left: object = self.__evaluate(expr.left)
-        if expr.operator.type == TokenType.OR:
-            if self.__is_truthy(left):
-                return left
+        distance: int = self.__locals.get(expr)
+        if distance is not None:
+            self.__environment.assign_at(distance, expr.name, value)
         else:
-            if not self.__is_truthy(left):
-                return left
+            self.globals.assign(expr.name, value)
 
-        return self.__evaluate(expr.right)
-
-    def visit_grouping_expr(self, expr: GroupingExpr) -> object:
-        return self.__evaluate(expr.expr)
+        return value
 
     def visit_binary_expr(self, expr: BinaryExpr) -> object | bool:
         left: object = self.__evaluate(expr.left)
@@ -90,18 +84,31 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         return function.call(self, arguments)
 
+    def visit_grouping_expr(self, expr: GroupingExpr) -> object:
+        return self.__evaluate(expr.expression)
+
+    @staticmethod
+    def visit_literal_expr(expr: LiteralExpr) -> object:
+        return expr.value
+
+    def visit_logical_expr(self, expr: LogicalExpr) -> object:
+        left: object = self.__evaluate(expr.left)
+        if expr.operator.type == TokenType.OR:
+            if self.__is_truthy(left):
+                return left
+        else:
+            if not self.__is_truthy(left):
+                return left
+
+        return self.__evaluate(expr.right)
+
     def visit_unary_expr(self, expr: UnaryExpr) -> object:
         right: object = self.__evaluate(expr.right)
 
         return self.__unary_operators[expr.operator.type](expr.operator, right)
 
     def visit_variable_expr(self, expr: VariableExpr) -> object:
-        return self.__environment.get(expr.name)
-
-    def visit_assign_expr(self, expr: AssignExpr) -> object:
-        value: object = self.__evaluate(expr.value)
-        self.__environment.assign(expr.name, value)
-        return value
+        return self.__lookup_variable(expr.name, expr)
 
     def visit_block_stmt(self, stmt: BlockStmt) -> None:
         self.execute_block(stmt.statements, Environment(self.__environment))
@@ -109,9 +116,26 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
         self.__evaluate(stmt.expression)
 
+    def visit_function_stmt(self, stmt: FunctionStmt) -> None:
+        function: LoxFunction = LoxFunction(stmt, self.__environment)
+        self.__environment.define(stmt.name.lexeme, function)
+
+    def visit_if_stmt(self, stmt: IfStmt) -> None:
+        if self.__is_truthy(self.__evaluate(stmt.condition)):
+            self.__execute(stmt.if_clause)
+        elif stmt.else_clause is not None:
+            self.__execute(stmt.else_clause)
+
     def visit_print_stmt(self, stmt: PrintStmt) -> None:
         value: object = self.__evaluate(stmt.expression)
         print(self.__stringify(value))
+
+    def visit_return_stmt(self, stmt: ReturnStmt) -> None:
+        value: object | None = None
+        if stmt.value is not None:
+            value = self.__evaluate(stmt.value)
+
+        raise Return(value)
 
     def visit_var_stmt(self, stmt: VarStmt) -> None:
         value: object | None = None
@@ -120,26 +144,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         self.__environment.define(stmt.name.lexeme, value)
 
-    def visit_if_stmt(self, stmt: IfStmt) -> None:
-        if self.__is_truthy(self.__evaluate(stmt.condition)):
-            self.__execute(stmt.if_clause)
-        elif stmt.else_clause is not None:
-            self.__execute(stmt.else_clause)
-
     def visit_while_stmt(self, stmt: WhileStmt) -> None:
         while self.__is_truthy(self.__evaluate(stmt.condition)):
             self.__execute(stmt.body)
-
-    def visit_function_stmt(self, stmt: FunctionStmt) -> None:
-        function: LoxFunction = LoxFunction(stmt, self.__environment)
-        self.__environment.define(stmt.name.lexeme, function)
-
-    def visit_return_stmt(self, stmt: ReturnStmt) -> None:
-        value: object | None = None
-        if stmt.value is not None:
-            value = self.__evaluate(stmt.value)
-
-        raise Return(value)
 
     def __mode_execute(self, stmt: Stmt, mode: OpMode) -> None:
         if mode == OpMode.INTERACTIVE and isinstance(stmt, ExpressionStmt):
@@ -154,6 +161,13 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def __execute(self, stmt: Stmt) -> None:
         return stmt.accept(self)
 
+    def __lookup_variable(self, name: Token, expr: Expr) -> object:
+        distance: int | None = self.__locals.get(expr)
+        if distance is not None:
+            return self.__environment.get_at(distance, name.lexeme)
+        else:
+            return self.globals.get(name)
+
     def execute_block(self, statements: list[Stmt], environment: Environment) -> None:
         previous: Environment = self.__environment
         try:
@@ -163,14 +177,8 @@ class Interpreter(ExprVisitor, StmtVisitor):
         finally:
             self.__environment = previous
 
-    @staticmethod
-    def __is_truthy(obj: object) -> bool:
-        if obj is None:
-            return False
-        if isinstance(obj, bool):
-            return obj
-
-        return True
+    def resolve(self, expr: Expr, depth: int) -> None:
+        self.__locals |= {expr: depth}
 
     @staticmethod
     def __is_equal(a: object, b: object) -> bool:
@@ -180,6 +188,15 @@ class Interpreter(ExprVisitor, StmtVisitor):
             return False
 
         return a == b
+
+    @staticmethod
+    def __is_truthy(obj: object) -> bool:
+        if obj is None:
+            return False
+        if isinstance(obj, bool):
+            return obj
+
+        return True
 
     @staticmethod
     def __check_number_operand(operator: Token, operand: object) -> None:
@@ -197,17 +214,15 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     @staticmethod
     def __stringify(obj: object) -> str:
-        if obj is True:
-            return "true"
-        if obj is False:
-            return "false"
-        if obj is None:
-            return "nil"
-        if isinstance(obj, float):
-            text: str = str(obj)
-            if text.endswith(".0"):
-                text = text[:-2]
-            return text
+        match obj:
+            case True: return "true"
+            case False: return "false"
+            case None: return "nil"
+            case _ if isinstance(obj, float):
+                text: str = str(obj)
+                if text.endswith(".0"):
+                    text = text[:-2]
+                return text
 
         return str(obj)
 
