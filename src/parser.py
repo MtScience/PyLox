@@ -316,6 +316,8 @@ class Parser:
 
         return self.__call()
 
+    # I know, it's customary in Python to use "*args" for vararg functions and methods, but here I decided to use
+    # "*types" to make the definition slightly more readable
     def __match(self, *types) -> bool:
         for typ in types:
             if self.__check(typ):
