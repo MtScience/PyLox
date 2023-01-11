@@ -42,3 +42,6 @@ class Environment:
 
     def get_at(self, distance: int, name: str) -> object:
         return self.ancestor(distance).values.get(name)
+
+
+__all__ = "Environment"
