@@ -9,6 +9,7 @@ from tokenclass import Token
 class FunctionType(Enum):
     NONE = auto()
     FUNCTION = auto()
+    METHOD = auto()
 
 
 class Resolver(ExprVisitor, StmtVisitor):
@@ -36,6 +37,9 @@ class Resolver(ExprVisitor, StmtVisitor):
         for argument in expr.arguments:
             self.__resolve_expr(argument)
 
+    def visit_get_expr(self, expr: GetExpr) -> None:
+        self.__resolve_expr(expr.obj)
+
     def visit_grouping_expr(self, expr: GroupingExpr) -> None:
         self.__resolve_expr(expr.expression)
 
@@ -46,6 +50,10 @@ class Resolver(ExprVisitor, StmtVisitor):
     def visit_logical_expr(self, expr: LogicalExpr) -> None:
         self.__resolve_expr(expr.left)
         self.__resolve_expr(expr.right)
+
+    def visit_set_expr(self, expr: SetExpr) -> None:
+        self.__resolve_expr(expr.value)
+        self.__resolve_expr(expr.obj)
 
     def visit_unary_expr(self, expr: UnaryExpr) -> None:
         self.__resolve_expr(expr.right)
@@ -66,6 +74,10 @@ class Resolver(ExprVisitor, StmtVisitor):
     def visit_class_stmt(self, stmt: ClassStmt) -> None:
         self.__declare(stmt.name)
         self.__define(stmt.name)
+
+        for method in stmt.methods:
+            declaration: FunctionType = FunctionType.METHOD
+            self.__resolve_function(method, declaration)
 
     def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
         self.__resolve_expr(stmt.expression)
@@ -112,7 +124,6 @@ class Resolver(ExprVisitor, StmtVisitor):
         stmt.accept(self)
 
     def __resolve_local(self, expr: Expr, name: Token) -> None:
-        # TODO: simplify the loop, if possible
         for i in range(len(self.__scopes) - 1, -1, -1):
             if name.lexeme in self.__scopes[i]:
                 self.__interpreter.resolve(expr, len(self.__scopes) - 1 - i)
