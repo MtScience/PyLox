@@ -289,6 +289,8 @@ class Parser:
             return LiteralExpr(None)
         if self.__match(TokenType.NUMBER, TokenType.STRING):
             return LiteralExpr(self.__previous().literal)
+        if self.__match(TokenType.THIS):
+            return ThisExpr(self.__previous())
         if self.__match(TokenType.IDENTIFIER):
             return VariableExpr(self.__previous())
         if self.__match(TokenType.LEFT_PAREN):
