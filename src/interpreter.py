@@ -5,6 +5,7 @@ from environment import Environment
 from errors import LoxRuntimeError
 from expr import *
 from lox_callable import LoxCallable
+from lox_class import LoxClass
 from lox_function import LoxFunction
 from lox_native import *
 from return_class import Return
@@ -112,6 +113,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def visit_block_stmt(self, stmt: BlockStmt) -> None:
         self.execute_block(stmt.statements, Environment(self.__environment))
+
+    def visit_class_stmt(self, stmt: ClassStmt) -> None:
+        self.__environment.define(stmt.name.lexeme, None)
+        klass: LoxClass = LoxClass(stmt.name.lexeme)
+        self.__environment.assign(stmt.name, klass)
 
     def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
         self.__evaluate(stmt.expression)
