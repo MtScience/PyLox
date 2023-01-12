@@ -5,7 +5,7 @@ from environment import Environment
 from errors import LoxRuntimeError
 from expr import *
 from lox_callable import LoxCallable
-from lox_class import LoxClass
+from lox_class import *
 from lox_function import LoxFunction
 from lox_native import *
 from return_class import Return
@@ -85,6 +85,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         return function.call(self, arguments)
 
+    def visit_get_expr(self, expr: GetExpr) -> object:
+        obj: object = self.__evaluate(expr.obj)
+        if isinstance(obj, LoxInstance):
+            return obj.get(expr.name)
+
     def visit_grouping_expr(self, expr: GroupingExpr) -> object:
         return self.__evaluate(expr.expression)
 
@@ -103,6 +108,17 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         return self.__evaluate(expr.right)
 
+    def visit_set_expr(self, expr: SetExpr) -> object:
+        obj: object = self.__evaluate(expr.obj)
+
+        if not isinstance(obj, LoxInstance):
+            raise LoxRuntimeError(expr.name, "Only instances have fields.")
+
+        value: object = self.__evaluate(expr.value)
+        obj.set(expr.name, value)
+
+        return value
+
     def visit_unary_expr(self, expr: UnaryExpr) -> object:
         right: object = self.__evaluate(expr.right)
 
@@ -116,7 +132,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def visit_class_stmt(self, stmt: ClassStmt) -> None:
         self.__environment.define(stmt.name.lexeme, None)
-        klass: LoxClass = LoxClass(stmt.name.lexeme)
+
+        methods: dict[str, LoxFunction] = \
+            {method.name.lexeme: LoxFunction(method, self.__environment) for method in stmt.methods}
+
+        klass: LoxClass = LoxClass(stmt.name.lexeme, methods)
         self.__environment.assign(stmt.name, klass)
 
     def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
