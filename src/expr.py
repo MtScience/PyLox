@@ -35,6 +35,9 @@ class ExprVisitor(ABC):
     def visit_set_expr(self, expr: Expr): ...
 
     @abstractmethod
+    def visit_this_expr(self, expr: Expr): ...
+
+    @abstractmethod
     def visit_unary_expr(self, expr: Expr): ...
 
     @abstractmethod
@@ -115,6 +118,14 @@ class SetExpr(Expr):
         return visitor.visit_set_expr(self)
 
 
+class ThisExpr(Expr):
+    def __init__(self, keyword: Token):
+        self.keyword: Token = keyword
+
+    def accept(self, visitor: ExprVisitor):
+        return visitor.visit_this_expr(self)
+
+
 class UnaryExpr(Expr):
     def __init__(self, operator: Token, right: Expr):
         self.operator: Token = operator
@@ -132,4 +143,4 @@ class VariableExpr(Expr):
         return visitor.visit_variable_expr(self)
 
 
-__all__ = ["Expr", "ExprVisitor", "AssignExpr", "BinaryExpr", "CallExpr", "GetExpr", "GroupingExpr", "LiteralExpr", "LogicalExpr", "SetExpr", "UnaryExpr", "VariableExpr"]
+__all__ = ["Expr", "ExprVisitor", "AssignExpr", "BinaryExpr", "CallExpr", "GetExpr", "GroupingExpr", "LiteralExpr", "LogicalExpr", "SetExpr", "ThisExpr", "UnaryExpr", "VariableExpr"]
