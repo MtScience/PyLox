@@ -147,6 +147,8 @@ class Parser:
 
     def __declaration(self) -> Stmt | None:
         try:
+            if self.__match(TokenType.CLASS):
+                return self.__class_declaration()
             if self.__match(TokenType.FUN):
                 return self.__function("function")
             if self.__match(TokenType.VAR):
@@ -165,6 +167,18 @@ class Parser:
 
         self.__consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
         return VarStmt(name, initializer)
+
+    def __class_declaration(self) -> ClassStmt:
+        name: Token = self.__consume(TokenType.IDENTIFIER, "Expect class name.")
+        self.__consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
+
+        methods: list[FunctionStmt] = []
+        while not (self.__check(TokenType.RIGHT_BRACE) or self.__is_at_end()):
+            methods.append(self.__function("method"))
+
+        self.__consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
+
+        return ClassStmt(name, methods)
 
     def __assignment(self) -> Expr:
         expr: Expr = self.__or()
