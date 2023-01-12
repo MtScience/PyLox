@@ -28,7 +28,7 @@ class Environment:
     def assign_at(self, distance: int, name: Token, value: object) -> None:
         self.ancestor(distance).values |= {name.lexeme: value}
 
-    def define(self, name: str, value: object) -> None:
+    def define(self, name: str, value: object | None) -> None:
         self.values |= {name: value}
 
     def get(self, name: Token) -> object:
