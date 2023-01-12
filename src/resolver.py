@@ -6,6 +6,11 @@ from stmt import *
 from tokenclass import Token
 
 
+class ClassType(Enum):
+    NONE = auto()
+    CLASS = auto()
+
+
 class FunctionType(Enum):
     NONE = auto()
     FUNCTION = auto()
@@ -18,6 +23,7 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__interpreter = interpreter
         self.__scopes: deque[dict[str, bool]] = deque()
         self.__current_function: FunctionType = FunctionType.NONE
+        self.__current_class: ClassType = ClassType.NONE
 
     def resolve(self, statements: list[Stmt]) -> None:
         for statement in statements:
@@ -55,6 +61,13 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__resolve_expr(expr.value)
         self.__resolve_expr(expr.obj)
 
+    def visit_this_expr(self, expr: ThisExpr) -> None:
+        if self.__current_class == ClassType.NONE:
+            self.__lox_main.token_error(expr.keyword, "Can't use 'this' outside of a class.")
+            return
+
+        self.__resolve_local(expr, expr.keyword)
+
     def visit_unary_expr(self, expr: UnaryExpr) -> None:
         self.__resolve_expr(expr.right)
 
@@ -72,12 +85,22 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__end_scope()
 
     def visit_class_stmt(self, stmt: ClassStmt) -> None:
+        enclosing_class: ClassType = self.__current_class
+        self.__current_class = ClassType.CLASS
+
         self.__declare(stmt.name)
         self.__define(stmt.name)
+
+        self.__begin_scope()
+        self.__scopes[-1] |= {"this": True}
 
         for method in stmt.methods:
             declaration: FunctionType = FunctionType.METHOD
             self.__resolve_function(method, declaration)
+
+        self.__end_scope()
+
+        self.__current_class = enclosing_class
 
     def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
         self.__resolve_expr(stmt.expression)
