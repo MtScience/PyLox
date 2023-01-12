@@ -19,6 +19,9 @@ class ExprVisitor(ABC):
     def visit_call_expr(self, expr: Expr): ...
 
     @abstractmethod
+    def visit_get_expr(self, expr: Expr): ...
+
+    @abstractmethod
     def visit_grouping_expr(self, expr: Expr): ...
 
     @staticmethod
@@ -27,6 +30,9 @@ class ExprVisitor(ABC):
 
     @abstractmethod
     def visit_logical_expr(self, expr: Expr): ...
+
+    @abstractmethod
+    def visit_set_expr(self, expr: Expr): ...
 
     @abstractmethod
     def visit_unary_expr(self, expr: Expr): ...
@@ -64,6 +70,15 @@ class CallExpr(Expr):
         return visitor.visit_call_expr(self)
 
 
+class GetExpr(Expr):
+    def __init__(self, obj: Expr, name: Token):
+        self.obj: Expr = obj
+        self.name: Token = name
+
+    def accept(self, visitor: ExprVisitor):
+        return visitor.visit_get_expr(self)
+
+
 class GroupingExpr(Expr):
     def __init__(self, expression: Expr):
         self.expression: Expr = expression
@@ -90,6 +105,16 @@ class LogicalExpr(Expr):
         return visitor.visit_logical_expr(self)
 
 
+class SetExpr(Expr):
+    def __init__(self, obj: Expr, name: Token, value: Expr):
+        self.obj: Expr = obj
+        self.name: Token = name
+        self.value: Expr = value
+
+    def accept(self, visitor: ExprVisitor):
+        return visitor.visit_set_expr(self)
+
+
 class UnaryExpr(Expr):
     def __init__(self, operator: Token, right: Expr):
         self.operator: Token = operator
@@ -107,4 +132,4 @@ class VariableExpr(Expr):
         return visitor.visit_variable_expr(self)
 
 
-__all__ = ["Expr", "ExprVisitor", "AssignExpr", "BinaryExpr", "CallExpr", "GroupingExpr", "LiteralExpr", "LogicalExpr", "UnaryExpr", "VariableExpr"]
+__all__ = ["Expr", "ExprVisitor", "AssignExpr", "BinaryExpr", "CallExpr", "GetExpr", "GroupingExpr", "LiteralExpr", "LogicalExpr", "SetExpr", "UnaryExpr", "VariableExpr"]
