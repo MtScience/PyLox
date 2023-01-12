@@ -119,6 +119,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         return value
 
+    def visit_this_expr(self, expr: ThisExpr) -> object:
+        return self.__lookup_variable(expr.keyword, expr)
+
     def visit_unary_expr(self, expr: UnaryExpr) -> object:
         right: object = self.__evaluate(expr.right)
 
