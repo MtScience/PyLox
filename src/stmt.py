@@ -34,6 +34,9 @@ class StmtVisitor(ABC):
     @abstractmethod
     def visit_while_stmt(self, stmt: Stmt): ...
 
+    @abstractmethod
+    def visit_class_stmt(self, stmt: Stmt): ...
+
 
 class BlockStmt(Stmt):
     def __init__(self, statements: list[Stmt]):
@@ -106,4 +109,13 @@ class WhileStmt(Stmt):
         return visitor.visit_while_stmt(self)
 
 
-__all__ = ["Stmt", "StmtVisitor", "BlockStmt", "ExpressionStmt", "FunctionStmt", "IfStmt", "PrintStmt", "ReturnStmt", "VarStmt", "WhileStmt"]
+class ClassStmt(Stmt):
+    def __init__(self, name: Token, methods: list[FunctionStmt]):
+        self.name: Token = name
+        self.methods: list[FunctionStmt] = methods
+
+    def accept(self, visitor: StmtVisitor):
+        return visitor.visit_class_stmt(self)
+
+
+__all__ = ["Stmt", "StmtVisitor", "BlockStmt", "ExpressionStmt", "FunctionStmt", "IfStmt", "PrintStmt", "ReturnStmt", "VarStmt", "WhileStmt", "ClassStmt"]
