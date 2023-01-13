@@ -10,18 +10,19 @@ class LoxClass(LoxCallable):
         self.__methods: dict[str, LoxFunction] = methods
 
     def find_method(self, name: str) -> LoxFunction | None:
-        # Theoretically equivalent to just "self.__methods.get". TODO: check if replaceable
-        if name in self.__methods:
-            return self.__methods.get(name)
-
-        return
+        return self.__methods.get(name)
 
     def call(self, interpreter, arguments: list[object]) -> object:
         instance: LoxInstance = LoxInstance(self)
+        initializer: LoxFunction = self.find_method("init")
+        if initializer is not None:
+            initializer.bind(instance).call(interpreter, arguments)
+
         return instance
 
     def arity(self) -> int:
-        return 0
+        initializer: LoxFunction = self.find_method("init")
+        return 0 if initializer is None else initializer.arity()
 
     def __str__(self) -> str:
         return f"<class {self.name}>"
