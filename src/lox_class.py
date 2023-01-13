@@ -8,15 +8,13 @@ class LoxClass(LoxCallable):
     def __init__(self, name: str, superclass, methods: dict[str, LoxFunction]):
         self.name: str = name
         self.superclass: LoxClass | None = superclass
-        self.__methods: dict[str, LoxFunction] = methods
+
+        self.methods: dict[str, LoxFunction] = self.superclass.methods | methods if self.superclass is not None \
+            else methods
 
     def find_method(self, name: str) -> LoxFunction | None:
-        # FIXME: Optimize inheritance via copy-down technique
-        if name in self.__methods:
-            return self.__methods[name]
-
-        if self.superclass is not None:
-            return self.superclass.find_method(name)
+        if name in self.methods:
+            return self.methods[name]
 
         return
 
