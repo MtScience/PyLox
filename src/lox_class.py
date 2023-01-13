@@ -5,12 +5,19 @@ from tokenclass import Token
 
 
 class LoxClass(LoxCallable):
-    def __init__(self, name: str, methods: dict[str, LoxFunction]):
+    def __init__(self, name: str, superclass, methods: dict[str, LoxFunction]):
         self.name: str = name
+        self.superclass: LoxClass | None = superclass
         self.__methods: dict[str, LoxFunction] = methods
 
     def find_method(self, name: str) -> LoxFunction | None:
-        return self.__methods.get(name)
+        if name in self.__methods:
+            return self.__methods.get(name)
+
+        if self.superclass is not None:
+            return self.superclass.find_method(name)
+
+        return
 
     def call(self, interpreter, arguments: list[object]) -> object:
         instance: LoxInstance = LoxInstance(self)
