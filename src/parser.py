@@ -170,6 +170,12 @@ class Parser:
 
     def __class_declaration(self) -> ClassStmt:
         name: Token = self.__consume(TokenType.IDENTIFIER, "Expect class name.")
+
+        superclass: VariableExpr | None = None
+        if self.__match(TokenType.LESS):
+            self.__consume(TokenType.IDENTIFIER, "Expect superclass name.")
+            superclass = VariableExpr(self.__previous())
+
         self.__consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
 
         methods: list[FunctionStmt] = []
@@ -178,7 +184,7 @@ class Parser:
 
         self.__consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
 
-        return ClassStmt(name, methods)
+        return ClassStmt(name, superclass, methods)
 
     def __assignment(self) -> Expr:
         expr: Expr = self.__or()
@@ -289,6 +295,11 @@ class Parser:
             return LiteralExpr(None)
         if self.__match(TokenType.NUMBER, TokenType.STRING):
             return LiteralExpr(self.__previous().literal)
+        if self.__match(TokenType.SUPER):
+            keyword: Token = self.__previous()
+            self.__consume(TokenType.DOT, "Expect '.' after 'super'.")
+            method: Token = self.__consume(TokenType.IDENTIFIER, "Expect superclass method name.")
+            return SuperExpr(keyword, method)
         if self.__match(TokenType.THIS):
             return ThisExpr(self.__previous())
         if self.__match(TokenType.IDENTIFIER):
