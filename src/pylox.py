@@ -31,17 +31,13 @@ class Lox:
         self.had_error = True
 
     def __run(self, source: str, mode: OpMode) -> None:
-        scanner: Scanner = Scanner(source, self)
-        tokens: list[Token] = scanner.scan_tokens()
-
-        parser: Parser = Parser(tokens, self)
-        statements: list[Stmt] = parser.parse()
+        tokens: list[Token] = Scanner(source, self).scan_tokens()
+        statements: list[Stmt] = Parser(tokens, self).parse()
 
         if self.had_error:
             return
 
-        resolver: Resolver = Resolver(self.__interpreter, self)
-        resolver.resolve(statements)
+        Resolver(self.__interpreter, self).resolve(statements)
 
         if self.had_error:
             return
