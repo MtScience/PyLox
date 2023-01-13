@@ -8,40 +8,45 @@ class Expr(ABC):
     def accept(self, visitor): ...
 
 
+# "None" as output type was added for the Resolver class, since at resolution pass expressions don't produce values,
+# but they do at runtime
 class ExprVisitor(ABC):
     @abstractmethod
-    def visit_assign_expr(self, expr: Expr): ...
+    def visit_assign_expr(self, expr: Expr) -> object | None: ...
 
     @abstractmethod
-    def visit_binary_expr(self, expr: Expr): ...
+    def visit_binary_expr(self, expr: Expr) -> object | None: ...
 
     @abstractmethod
-    def visit_call_expr(self, expr: Expr): ...
+    def visit_call_expr(self, expr: Expr) -> object | None: ...
 
     @abstractmethod
-    def visit_get_expr(self, expr: Expr): ...
+    def visit_get_expr(self, expr: Expr) -> object | None: ...
 
     @abstractmethod
-    def visit_grouping_expr(self, expr: Expr): ...
+    def visit_grouping_expr(self, expr: Expr) -> object | None: ...
 
     @staticmethod
     @abstractmethod
-    def visit_literal_expr(expr: Expr): ...
+    def visit_literal_expr(expr: Expr) -> object | None: ...
 
     @abstractmethod
-    def visit_logical_expr(self, expr: Expr): ...
+    def visit_logical_expr(self, expr: Expr) -> object | None: ...
 
     @abstractmethod
-    def visit_set_expr(self, expr: Expr): ...
+    def visit_set_expr(self, expr: Expr) -> object | None: ...
 
     @abstractmethod
-    def visit_this_expr(self, expr: Expr): ...
+    def visit_super_expr(self, expr: Expr) -> object | None: ...
 
     @abstractmethod
-    def visit_unary_expr(self, expr: Expr): ...
+    def visit_this_expr(self, expr: Expr) -> object | None: ...
 
     @abstractmethod
-    def visit_variable_expr(self, expr: Expr): ...
+    def visit_unary_expr(self, expr: Expr) -> object | None: ...
+
+    @abstractmethod
+    def visit_variable_expr(self, expr: Expr) -> object | None: ...
 
 
 class AssignExpr(Expr):
@@ -118,6 +123,15 @@ class SetExpr(Expr):
         return visitor.visit_set_expr(self)
 
 
+class SuperExpr(Expr):
+    def __init__(self, keyword: Token, method: Token):
+        self.keyword: Token = keyword
+        self.method: Token = method
+
+    def accept(self, visitor: ExprVisitor):
+        return visitor.visit_super_expr(self)
+
+
 class ThisExpr(Expr):
     def __init__(self, keyword: Token):
         self.keyword: Token = keyword
@@ -143,4 +157,5 @@ class VariableExpr(Expr):
         return visitor.visit_variable_expr(self)
 
 
-__all__ = ["Expr", "ExprVisitor", "AssignExpr", "BinaryExpr", "CallExpr", "GetExpr", "GroupingExpr", "LiteralExpr", "LogicalExpr", "SetExpr", "ThisExpr", "UnaryExpr", "VariableExpr"]
+__all__ = ["Expr", "ExprVisitor", "AssignExpr", "BinaryExpr", "CallExpr", "GetExpr", "GroupingExpr",
+           "LiteralExpr", "LogicalExpr", "SetExpr", "SuperExpr", "ThisExpr", "UnaryExpr", "VariableExpr"]
