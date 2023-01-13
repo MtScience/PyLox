@@ -218,10 +218,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def __lookup_variable(self, name: Token, expr: Expr) -> object:
         distance: int | None = self.__locals.get(expr)
-        if distance is not None:
-            return self.__environment.get_at(distance, name.lexeme)
-        else:
-            return self.globals.get(name)
+        return self.__environment.get_at(distance, name.lexeme) if distance is not None else self.globals.get(name)
 
     def execute_block(self, statements: list[Stmt], environment: Environment) -> None:
         previous: Environment = self.__environment
