@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from expr import Expr
+from expr import Expr, VariableExpr
 from tokenclass import Token
 
 
@@ -9,33 +9,34 @@ class Stmt(ABC):
     def accept(self, visitor): ...
 
 
+# All "visit_<type>_stmt" methods shouldn't produce output since statements don't produce values
 class StmtVisitor(ABC):
     @abstractmethod
-    def visit_block_stmt(self, stmt: Stmt): ...
+    def visit_block_stmt(self, stmt: Stmt) -> None: ...
 
     @abstractmethod
-    def visit_expression_stmt(self, stmt: Stmt): ...
+    def visit_expression_stmt(self, stmt: Stmt) -> None: ...
 
     @abstractmethod
-    def visit_function_stmt(self, stmt: Stmt): ...
+    def visit_function_stmt(self, stmt: Stmt) -> None: ...
 
     @abstractmethod
-    def visit_if_stmt(self, stmt: Stmt): ...
+    def visit_if_stmt(self, stmt: Stmt) -> None: ...
 
     @abstractmethod
-    def visit_print_stmt(self, stmt: Stmt): ...
+    def visit_print_stmt(self, stmt: Stmt) -> None: ...
 
     @abstractmethod
-    def visit_return_stmt(self, stmt: Stmt): ...
+    def visit_return_stmt(self, stmt: Stmt) -> None: ...
 
     @abstractmethod
-    def visit_var_stmt(self, stmt: Stmt): ...
+    def visit_var_stmt(self, stmt: Stmt) -> None: ...
 
     @abstractmethod
-    def visit_while_stmt(self, stmt: Stmt): ...
+    def visit_while_stmt(self, stmt: Stmt) -> None: ...
 
     @abstractmethod
-    def visit_class_stmt(self, stmt: Stmt): ...
+    def visit_class_stmt(self, stmt: Stmt) -> None: ...
 
 
 class BlockStmt(Stmt):
@@ -110,12 +111,14 @@ class WhileStmt(Stmt):
 
 
 class ClassStmt(Stmt):
-    def __init__(self, name: Token, methods: list[FunctionStmt]):
+    def __init__(self, name: Token, superclass: VariableExpr | None, methods: list[FunctionStmt]):
         self.name: Token = name
+        self.superclass: VariableExpr | None = superclass
         self.methods: list[FunctionStmt] = methods
 
     def accept(self, visitor: StmtVisitor):
         return visitor.visit_class_stmt(self)
 
 
-__all__ = ["Stmt", "StmtVisitor", "BlockStmt", "ExpressionStmt", "FunctionStmt", "IfStmt", "PrintStmt", "ReturnStmt", "VarStmt", "WhileStmt", "ClassStmt"]
+__all__ = ["Stmt", "StmtVisitor", "BlockStmt", "ExpressionStmt", "FunctionStmt",
+           "IfStmt", "PrintStmt", "ReturnStmt", "VarStmt", "WhileStmt", "ClassStmt"]
