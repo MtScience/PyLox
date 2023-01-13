@@ -40,7 +40,7 @@ class LoxInstance:
         if name.lexeme in self.__fields:
             return self.__fields[name.lexeme]
 
-        method: LoxFunction = self.__klass.find_method(name.lexeme)
+        method: LoxFunction | None = self.__klass.find_method(name.lexeme)
         if method is not None:
             return method.bind(self)
 
