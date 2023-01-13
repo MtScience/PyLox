@@ -33,7 +33,7 @@ class Environment:
 
     def get(self, name: Token) -> object:
         if name.lexeme in self.values:
-            return self.values.get(name.lexeme)
+            return self.values[name.lexeme]
 
         if self.enclosing is not None:
             return self.enclosing.get(name)
