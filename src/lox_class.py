@@ -13,10 +13,7 @@ class LoxClass(LoxCallable):
             else methods
 
     def find_method(self, name: str) -> LoxFunction | None:
-        if name in self.methods:
-            return self.methods[name]
-
-        return
+        return self.methods.get(name)
 
     def call(self, interpreter, arguments: list[object]) -> object:
         instance: LoxInstance = LoxInstance(self)
