@@ -9,6 +9,7 @@ from tokenclass import Token
 class ClassType(Enum):
     NONE = auto()
     CLASS = auto()
+    SUBCLASS = auto()
 
 
 class FunctionType(Enum):
@@ -62,6 +63,14 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__resolve_expr(expr.value)
         self.__resolve_expr(expr.obj)
 
+    def visit_super_expr(self, expr: SuperExpr) -> None:
+        if self.__current_class == ClassType.NONE:
+            self.__lox_main.token_error(expr.keyword, "Can't use 'super' outside of a class.")
+        elif self.__current_class != ClassType.SUBCLASS:
+            self.__lox_main.token_error(expr.keyword, "Can't use 'super' in a class with no superclass.")
+
+        self.__resolve_local(expr, expr.keyword)
+
     def visit_this_expr(self, expr: ThisExpr) -> None:
         if self.__current_class == ClassType.NONE:
             self.__lox_main.token_error(expr.keyword, "Can't use 'this' outside of a class.")
@@ -92,6 +101,18 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__declare(stmt.name)
         self.__define(stmt.name)
 
+        # TODO: Maybe it is wise to combine the three "if"s into a nested "if"?
+        if stmt.superclass is not None and stmt.name.lexeme == stmt.superclass.name.lexeme:
+            self.__lox_main.token_error(stmt.superclass.name, "A class can't inherit from itself.")
+
+        if stmt.superclass is not None:
+            self.__current_class = ClassType.SUBCLASS
+            self.__resolve_expr(stmt.superclass)
+
+        if stmt.superclass is not None:
+            self.__begin_scope()
+            self.__scopes[-1] |= {"super": True}
+
         self.__begin_scope()
         self.__scopes[-1] |= {"this": True}
 
@@ -101,6 +122,9 @@ class Resolver(ExprVisitor, StmtVisitor):
             self.__resolve_function(method, declaration)
 
         self.__end_scope()
+
+        if stmt.superclass is not None:
+            self.__end_scope()
 
         self.__current_class = enclosing_class
 
