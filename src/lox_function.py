@@ -26,7 +26,7 @@ class LoxFunction(LoxCallable):
         try:
             interpreter.execute_block(self.__declaration.body, environment)
         except Return as return_value:
-            return return_value.value
+            return self.__closure.get_at(0, "this") if self.__is_initializer else return_value.value
 
         return self.__closure.get_at(0, "this") if self.__is_initializer else None
 
