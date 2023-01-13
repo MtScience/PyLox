@@ -29,39 +29,39 @@ class Resolver(ExprVisitor, StmtVisitor):
 
     def resolve(self, statements: list[Stmt]) -> None:
         for statement in statements:
-            self.__resolve_stmt(statement)
+            self.__resolve(statement)
 
     def visit_assign_expr(self, expr: AssignExpr) -> None:
-        self.__resolve_expr(expr.value)
+        self.__resolve(expr.value)
         self.__resolve_local(expr, expr.name)
 
     def visit_binary_expr(self, expr: BinaryExpr) -> None:
-        self.__resolve_expr(expr.left)
-        self.__resolve_expr(expr.right)
+        self.__resolve(expr.left)
+        self.__resolve(expr.right)
 
     def visit_call_expr(self, expr: CallExpr) -> None:
-        self.__resolve_expr(expr.callee)
+        self.__resolve(expr.callee)
 
         for argument in expr.arguments:
-            self.__resolve_expr(argument)
+            self.__resolve(argument)
 
     def visit_get_expr(self, expr: GetExpr) -> None:
-        self.__resolve_expr(expr.obj)
+        self.__resolve(expr.obj)
 
     def visit_grouping_expr(self, expr: GroupingExpr) -> None:
-        self.__resolve_expr(expr.expression)
+        self.__resolve(expr.expression)
 
     @staticmethod
     def visit_literal_expr(expr: LiteralExpr) -> None:
         pass
 
     def visit_logical_expr(self, expr: LogicalExpr) -> None:
-        self.__resolve_expr(expr.left)
-        self.__resolve_expr(expr.right)
+        self.__resolve(expr.left)
+        self.__resolve(expr.right)
 
     def visit_set_expr(self, expr: SetExpr) -> None:
-        self.__resolve_expr(expr.value)
-        self.__resolve_expr(expr.obj)
+        self.__resolve(expr.value)
+        self.__resolve(expr.obj)
 
     def visit_super_expr(self, expr: SuperExpr) -> None:
         if self.__current_class == ClassType.NONE:
@@ -79,7 +79,7 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__resolve_local(expr, expr.keyword)
 
     def visit_unary_expr(self, expr: UnaryExpr) -> None:
-        self.__resolve_expr(expr.right)
+        self.__resolve(expr.right)
 
     def visit_variable_expr(self, expr: VariableExpr) -> None:
         # Comparing as "is False" because "get" can return None, which is also false, but shouldn't satisfy the
@@ -106,7 +106,7 @@ class Resolver(ExprVisitor, StmtVisitor):
                 self.__lox_main.token_error(stmt.superclass.name, "A class can't inherit from itself.")
 
             self.__current_class = ClassType.SUBCLASS
-            self.__resolve_expr(stmt.superclass)
+            self.__resolve(stmt.superclass)
 
             self.__begin_scope()
             self.__scopes[-1] |= {"super": True}
@@ -127,7 +127,7 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__current_class = enclosing_class
 
     def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
-        self.__resolve_expr(stmt.expression)
+        self.__resolve(stmt.expression)
 
     def visit_function_stmt(self, stmt: FunctionStmt) -> None:
         self.__declare(stmt.name)
@@ -136,13 +136,14 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__resolve_function(stmt, FunctionType.FUNCTION)
 
     def visit_if_stmt(self, stmt: IfStmt) -> None:
-        self.__resolve_expr(stmt.condition)
-        self.__resolve_stmt(stmt.if_clause)
+        self.__resolve(stmt.condition)
+        self.__resolve(stmt.if_clause)
+
         if stmt.else_clause is not None:
-            self.__resolve_stmt(stmt.else_clause)
+            self.__resolve(stmt.else_clause)
 
     def visit_print_stmt(self, stmt: PrintStmt) -> None:
-        self.__resolve_expr(stmt.expression)
+        self.__resolve(stmt.expression)
 
     def visit_return_stmt(self, stmt: ReturnStmt) -> None:
         if self.__current_function == FunctionType.NONE:
@@ -151,26 +152,23 @@ class Resolver(ExprVisitor, StmtVisitor):
         if stmt.value is not None:
             if self.__current_function == FunctionType.INITIALIZER:
                 self.__lox_main.token_error(stmt.keyword, "Can't return a value from an initializer.")
-            self.__resolve_expr(stmt.value)
+
+            self.__resolve(stmt.value)
 
     def visit_var_stmt(self, stmt: VarStmt) -> None:
         self.__declare(stmt.name)
+
         if stmt.initializer is not None:
-            self.__resolve_expr(stmt.initializer)
+            self.__resolve(stmt.initializer)
 
         self.__define(stmt.name)
 
     def visit_while_stmt(self, stmt: WhileStmt) -> None:
-        self.__resolve_expr(stmt.condition)
-        self.__resolve_stmt(stmt.body)
+        self.__resolve(stmt.condition)
+        self.__resolve(stmt.body)
 
-    # TODO: check if it is possible to combine the two private "resolve" methods, since except for argument types
-    #  they're identical
-    def __resolve_expr(self, expr: Expr) -> None:
-        expr.accept(self)
-
-    def __resolve_stmt(self, stmt: Stmt) -> None:
-        stmt.accept(self)
+    def __resolve(self, target: Expr | Stmt) -> None:
+        target.accept(self)
 
     def __resolve_local(self, expr: Expr, name: Token) -> None:
         for i in range(len(self.__scopes) - 1, -1, -1):
