@@ -74,6 +74,7 @@ exprs = {"Assign   : name: Token, value: Expr",
          "Literal  : value: object",
          "Logical  : left: Expr, operator: Token, right: Expr",
          "Set      : obj: Expr, name: Token, value: Expr",
+         "Super    : keyword: Token, method: Token",
          "This     : keyword: Token",
          "Unary    : operator: Token, right: Expr",
          "Variable : name: Token"}
@@ -87,5 +88,5 @@ stmts = {"Block      : statements: list[Stmt]",
          "Return     : keyword: Token, value: Expr | None",
          "Var        : name: Token, initializer: Expr",
          "While      : condition: Expr, body: Stmt",
-         "Class      : name: Token, methods: list[FunctionStmt]"}
-define_ast("../src", "Stmt", stmts, {{from = "expr", what = "Expr"}, {from = "tokenclass", what = "Token"}})
+         "Class      : name: Token, superclass: VariableExpr | None, methods: list[FunctionStmt]"}
+define_ast("../src", "Stmt", stmts, {{from = "expr", what = "Expr, VariableExpr"}, {from = "tokenclass", what = "Token"}})
