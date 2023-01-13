@@ -28,4 +28,4 @@ PyLox is mostly a direct translation of Java code in the book to Python (made id
 
 PyLox is considered complete (chapter 13 of the book completed). Currently it's code is being simplified and optimized. Also, there is a plan to add a number of native functions and (possibly) modify the REPL to make it more comfortable to use.
 
-All variables, class attributes and functions are type-hinted, except where doing so vould lead to a circular import.
+All variables, class attributes and functions are type-hinted, except where doing so would lead to circular imports.
