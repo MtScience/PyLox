@@ -194,11 +194,9 @@ class Parser:
             value: Expr = self.__assignment()
 
             if isinstance(expr, VariableExpr):
-                name: Token = expr.name
-                return AssignExpr(name, value)
+                return AssignExpr(expr.name, value)
             elif isinstance(expr, GetExpr):
-                get: GetExpr = expr
-                return SetExpr(get.obj, get.name, value)
+                return SetExpr(expr.obj, expr.name, value)
 
             self.__error(equals, "Invalid assignment target.")
 
