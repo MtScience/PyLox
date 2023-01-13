@@ -101,15 +101,13 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__declare(stmt.name)
         self.__define(stmt.name)
 
-        # TODO: Maybe it is wise to combine the three "if"s into a nested "if"?
-        if stmt.superclass is not None and stmt.name.lexeme == stmt.superclass.name.lexeme:
-            self.__lox_main.token_error(stmt.superclass.name, "A class can't inherit from itself.")
-
         if stmt.superclass is not None:
+            if stmt.name.lexeme == stmt.superclass.name.lexeme:
+                self.__lox_main.token_error(stmt.superclass.name, "A class can't inherit from itself.")
+
             self.__current_class = ClassType.SUBCLASS
             self.__resolve_expr(stmt.superclass)
 
-        if stmt.superclass is not None:
             self.__begin_scope()
             self.__scopes[-1] |= {"super": True}
 
