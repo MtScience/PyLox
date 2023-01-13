@@ -56,10 +56,8 @@ class Interpreter(ExprVisitor, StmtVisitor):
         value: object = self.__evaluate(expr.value)
 
         distance: int = self.__locals.get(expr)
-        if distance is not None:
-            self.__environment.assign_at(distance, expr.name, value)
-        else:
-            self.globals.assign(expr.name, value)
+        self.__environment.assign_at(distance, expr.name, value) if distance is not None \
+            else self.globals.assign(expr.name, value)
 
         return value
 
