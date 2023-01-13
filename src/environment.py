@@ -16,7 +16,7 @@ class Environment:
 
     def assign(self, name: Token, value: object) -> None:
         if name.lexeme in self.values:
-            self.values |= {name.lexeme: value}
+            self.values[name.lexeme] = value
             return
 
         if self.enclosing is not None:
