@@ -7,14 +7,15 @@ class TokenType(Enum):
     RIGHT_PAREN = auto()
     LEFT_BRACE = auto()
     RIGHT_BRACE = auto()
+    CARET = auto()
     COMMA = auto()
     DOT = auto()
     MINUS = auto()
+    PERCENT = auto()
     PLUS = auto()
     SEMICOLON = auto()
     SLASH = auto()
     STAR = auto()
-    CARET = auto()
 
     # One or two character tokens
     BANG = auto()
