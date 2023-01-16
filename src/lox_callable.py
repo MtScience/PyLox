@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class LoxCallable(ABC):
-    @ abstractmethod
+    @abstractmethod
     def arity(self) -> int: ...
 
     @abstractmethod
