@@ -34,6 +34,17 @@ class Clock(LoxNativeFunction):
         return time.time()
 
 
+class GetLine(LoxNativeFunction):
+    def __init__(self):
+        self.name: str = "getline"
+
+    def arity(self) -> int:
+        return 0
+
+    def call(self, interpreter, _: list[object]) -> str:
+        return input()
+
+
 class Type(LoxNativeFunction):
     def __init__(self):
         self.name: str = "type"
@@ -91,7 +102,10 @@ class ToNumber(LoxNativeFunction):
         if not isinstance(obj, str):
             raise LoxFunctionError(self.name, "Expect type 'string'")
 
-        return float(obj)
+        try:
+            return float(obj)
+        except ValueError:
+            raise LoxFunctionError(self.name, "The string doesn't represent a valid number")
 
 
 # Mathematical functions
@@ -213,6 +227,24 @@ class Floor(MathFunction):
         return math.floor(obj)
 
 
+class Round(MathFunction):
+    def __init__(self):
+        self.name: str = "round"
+
+    def call(self, interpreter, arguments: list[object]) -> float:
+        obj: float = self.check_number(arguments[0])
+        return round(obj)
+
+
+class Absolute(MathFunction):
+    def __init__(self):
+        self.name = "abs"
+
+    def call(self, interpreter, arguments: list[object]) -> float:
+        obj: float = self.check_number(arguments[0])
+        return abs(obj)
+
+
 class Sign(MathFunction):
     def __init__(self):
         self.name: str = "sign"
@@ -227,7 +259,7 @@ class Sign(MathFunction):
         return -1
 
 
-native_functions: list = [Clock, Type, ToString, ToNumber, Exponent, Logarithm, ToRadians, Sine, Cosine, Tangent,
-                          ArcSine, ArcCosine, ArcTangent, Ceiling, Floor, Sign]
+native_functions: list = [Clock, GetLine, Type, ToString, ToNumber, Exponent, Logarithm, ToRadians, Sine, Cosine,
+                          Tangent, ArcSine, ArcCosine, ArcTangent, Ceiling, Floor, Round, Absolute, Sign]
 
 __all__ = ["LoxNativeFunction", "native_functions"]
