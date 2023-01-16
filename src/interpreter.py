@@ -2,7 +2,7 @@ from enum import Enum, auto
 from typing import SupportsFloat
 
 from environment import Environment
-from errors import LoxRuntimeError
+from errors import LoxRuntimeError, LoxFunctionError
 from expr import *
 from lox_callable import LoxCallable
 from lox_class import *
@@ -35,6 +35,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
             TokenType.SLASH: self.__binary_slash_handler,
             TokenType.STAR: self.__binary_star_handler,
             TokenType.CARET: self.__binary_caret_handler,
+            TokenType.PERCENT: self.__binary_percent_handler,
             TokenType.GREATER: self.__binary_gtr_handler,
             TokenType.GREATER_EQUAL: self.__binary_geq_handler,
             TokenType.LESS: self.__binary_less_handler,
@@ -54,8 +55,8 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def visit_assign_expr(self, expr: AssignExpr) -> object:
         value: object = self.__evaluate(expr.value)
-
         distance: int = self.__locals.get(expr)
+
         self.__environment.assign_at(distance, expr.name, value) if distance is not None \
             else self.globals.assign(expr.name, value)
 
@@ -78,7 +79,10 @@ class Interpreter(ExprVisitor, StmtVisitor):
         if (arg_no := len(arguments)) != (arity := function.arity()):
             raise LoxRuntimeError(expr.paren, f"Expected {arity} arguments but got {arg_no}.")
 
-        return function.call(self, arguments)
+        try:
+            return function.call(self, arguments)
+        except LoxFunctionError as err:
+            raise LoxRuntimeError(expr.paren, f"in function {err.function}: {err.message}.")
 
     def visit_get_expr(self, expr: GetExpr) -> object:
         obj: object = self.__evaluate(expr.obj)
@@ -293,6 +297,10 @@ class Interpreter(ExprVisitor, StmtVisitor):
         self.__check_number_operands(operator, left, right)
         return float(left) / float(right)
 
+    def __binary_percent_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> float:
+        self.__check_number_operands(operator, left, right)
+        return float(left) % float(right)
+
     def __binary_star_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> float:
         self.__check_number_operands(operator, left, right)
         return float(left) * float(right)
@@ -324,7 +332,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
     # Method to define native Lox functions (so as to not pollute the __init__)
 
     def __define_natives(self) -> None:
-        self.globals.define("clock", Clock())
+        for function in native_functions:
+            function: LoxNativeFunction = function()
+            self.globals.define(function.name, function)
 
 
 __all__ = ["Interpreter", "OpMode"]
