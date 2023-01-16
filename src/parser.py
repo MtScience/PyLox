@@ -204,7 +204,6 @@ class Parser:
 
     def __block(self) -> list[Stmt]:
         statements: list[Stmt] = []
-
         while not (self.__check(TokenType.RIGHT_BRACE) or self.__is_at_end()):
             statements.append(self.__declaration())
 
@@ -267,7 +266,7 @@ class Parser:
     def __factor(self) -> Expr:
         expr: Expr = self.__power()
 
-        while self.__match(TokenType.SLASH, TokenType.STAR):
+        while self.__match(TokenType.SLASH, TokenType.STAR, TokenType.PERCENT):
             operator: Token = self.__previous()
             right: Expr = self.__power()
             expr = BinaryExpr(expr, operator, right)
