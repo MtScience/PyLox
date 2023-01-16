@@ -332,9 +332,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
     # Method to define native Lox functions (so as to not pollute the __init__)
 
     def __define_natives(self) -> None:
-        for function in native_functions:
-            function: LoxNativeFunction = function()
-            self.globals.define(function.name, function)
+        for native in native_functions:
+            native: LoxNativeFunction = native()
+            self.globals.define(native.name, native)
 
 
 __all__ = ["Interpreter", "OpMode"]
