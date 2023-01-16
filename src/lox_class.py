@@ -33,14 +33,14 @@ class LoxClass(LoxCallable):
 
 class LoxInstance:
     def __init__(self, klass: LoxClass):
-        self.__klass: LoxClass = klass
+        self.klass: LoxClass = klass
         self.__fields: dict[str, object] = {}
 
     def get(self, name: Token) -> object:
         if name.lexeme in self.__fields:
             return self.__fields[name.lexeme]
 
-        method: LoxFunction | None = self.__klass.find_method(name.lexeme)
+        method: LoxFunction | None = self.klass.find_method(name.lexeme)
         if method is not None:
             return method.bind(self)
 
@@ -50,7 +50,7 @@ class LoxInstance:
         self.__fields |= {name.lexeme: value}
 
     def __str__(self) -> str:
-        return f"<{self.__klass.name} instance>"
+        return f"<{self.klass.name} instance>"
 
 
 __all__ = ["LoxClass", "LoxInstance"]
