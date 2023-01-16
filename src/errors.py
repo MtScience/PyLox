@@ -12,4 +12,11 @@ class LoxRuntimeError(Exception):
         super().__init__(self.message)
 
 
-__all__ = ["ParseError", "LoxRuntimeError"]
+class LoxFunctionError(Exception):
+    def __init__(self, function: str, message: str):
+        self.function = function
+        self.message = message
+        super().__init__()
+
+
+__all__ = ["ParseError", "LoxRuntimeError", "LoxFunctionError"]
