@@ -119,6 +119,7 @@ class Scanner:
 
         if self.__is_at_end():
             self.__lox_main.line_error(self.__line, "Unterminated string.")
+            return
 
         self.__advance()
 
