@@ -238,6 +238,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
         if a is None:
             return False
 
+        # In Python bool subclasses int, so ints and bools can be equal, which isn't what we want.
+        # So, if the operands aren't both bools, we automatically return False
+        if not (isinstance(a, bool) and isinstance(b, bool)):
+            return False
+
         return a == b
 
     @staticmethod
