@@ -22,4 +22,3 @@ class TestLogical:
         lox.run_file(path)
         capture = capsys.readouterr().out
         assert capture == "\n".join(expected_val) + "\n"
-
