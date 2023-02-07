@@ -35,6 +35,3 @@ class TestClass:
         lox.run_file("class/local_inherit_other.lox")
         capture = capsys.readouterr().out
         assert capture == "<class B>\n"
-
-
-
