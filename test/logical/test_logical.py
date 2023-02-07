@@ -21,6 +21,5 @@ class TestLogical:
     def test_op_truth(self, capsys, lox, path, expected_val):
         lox.run_file(path)
         capture = capsys.readouterr().out
-
         assert capture == "\n".join(expected_val) + "\n"
 
