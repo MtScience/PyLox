@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from math import nan
 from typing import SupportsFloat
 
 from environment import Environment
@@ -300,6 +301,12 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def __binary_slash_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> float:
         self.__check_number_operands(operator, left, right)
+
+        # Java, apparently, automatically returns NaN when it encounters 0/0, but Python raises an error. Therefore,
+        # we manually handle this case
+        if left == right == 0:
+            return nan
+
         return float(left) / float(right)
 
     def __binary_percent_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> float:
