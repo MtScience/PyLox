@@ -67,9 +67,9 @@ class Lox:
             sys.exit(70)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if (length := len(sys.argv)) > 2:
-        print("Usage: pylox [script]")
+        print("Usage: pylox.py [script]")
         sys.exit(64)
     elif length == 2:
         Lox().run_file(sys.argv[1])
