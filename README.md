@@ -8,11 +8,15 @@ This is my Python 3.10 reimplementation of jlox as described in the awesome book
 
 The program is run with the command (on openSUSE Linux)
 
-    python3.10 pylox.py <script>
+```console
+python3.10 pylox.py <script>
+```
 
 to run a Lox script or with
 
-    python3.10 pylox.py
+```console
+python3.10 pylox.py
+```
 
 to run the interactive interpreter. The program requires no external dependencies.
 
