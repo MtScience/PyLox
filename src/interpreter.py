@@ -234,14 +234,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     @staticmethod
     def __is_equal(a: object, b: object) -> bool:
-        if a is None and b is None:
-            return True
-        if a is None:
-            return False
-
-        # In Python bool subclasses int, so ints and bools can be equal, which isn't what we want.
-        # So, if the operands aren't both bools, we automatically return False
-        if not (isinstance(a, bool) and isinstance(b, bool)):
+        # Apparently, the original Java version treats anything of different types as unequal, so we're going to do the
+        # same: is the types aren't precisely the same, the operands aren't equal, otherwise properly check for equality
+        if type(a) is not type(b):
             return False
 
         return a == b
