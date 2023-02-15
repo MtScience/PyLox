@@ -236,10 +236,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def __is_equal(a: object, b: object) -> bool:
         # Apparently, the original Java version treats anything of different types as unequal, so we're going to do the
         # same: is the types aren't precisely the same, the operands aren't equal, otherwise properly check for equality
-        if type(a) is not type(b):
-            return False
-
-        return a == b
+        return False if type(a) is not type(b) else a == b
 
     @staticmethod
     def __is_truthy(obj: object) -> bool:
