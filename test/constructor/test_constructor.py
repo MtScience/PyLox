@@ -50,7 +50,7 @@ class TestConstructor:
         capture = capsys.readouterr().err
         assert capture == "[line 3] Error at 'return': Can't return a value from an initializer.\n"
 
-    @pt.mark.parametrize("path, expected_numbers", arguments_settings, ids=arguments_ids)
+    @pt.mark.parametrize("path,expected_numbers", arguments_settings, ids=arguments_ids)
     def test_wrong_arguments(self, capsys, lox, path, expected_numbers):
         with pt.raises(SystemExit) as exc:
             lox.run_file(path)
