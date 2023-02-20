@@ -236,10 +236,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def __is_equal(a: object, b: object) -> bool:
         # Apparently, the original Java version treats anything of different types as unequal, so we're going to do the
         # same: is the types aren't precisely the same, the operands aren't equal, otherwise properly check for equality
-        if type(a) is not type(b):
-            return False
-
-        return a == b
+        return False if type(a) is not type(b) else a == b
 
     @staticmethod
     def __is_truthy(obj: object) -> bool:
@@ -299,10 +296,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         # Java, apparently, automatically returns NaN when it encounters 0/0, but Python raises an error. Therefore,
         # we manually handle this case
-        if left == right == 0:
-            return nan
-
-        return float(left) / float(right)
+        return nan if left == right == 0 else float(left) / float(right)
 
     def __binary_percent_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> float:
         self.__check_number_operands(operator, left, right)
