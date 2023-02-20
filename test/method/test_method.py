@@ -13,9 +13,9 @@ class TestMethods:
     def test_arity(self, capsys, lox):
         lox.run_file("method/arity.lox")
 
-        # This a Python way of doing what is known for Haskellers as "scanl". Rather ugly, might I say, when compared
+        # This a Python way of doing what is known among Haskellers as "scanl". Rather ugly, might I say, when compared
         # to the Haskell way:
-        # scanl (+) 1 [2 .. 9]
+        # scanl (+) 1 [2 .. 8]
         acc = 0
         nums = [acc := acc + x for x in range(1, 9)]
         expected_val = ["no args"] + [str(n) for n in nums]
