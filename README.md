@@ -18,7 +18,7 @@ to run a Lox script or with
 python3.10 pylox.py
 ```
 
-to run the interactive interpreter. The program requires no external dependencies.
+to run the interactive interpreter. The program requires no external dependencies (however, `pytest` is required to run the test suite).
 
 ## Differences from Robert's jlox
 
@@ -49,6 +49,12 @@ PyLox is mostly a direct translation of Java code in the book to Python (made id
   * `abs` – absolute value.
 - Implementation detail: replaced the recursive method lookup with copy-down inheritance (clox-inspired) for performance—it reduces the number of condition checks and recursive method calls.
 - Slightly changed the output format when printing classes and instances: their names are enclosed in angle brackets (e.g. `<class MyClass>` and `<MyClass instance>`) (inspired by Python's output format).
+
+## Test suite
+
+The test suite is taken directly from Robert's [suite](https://github.com/munificent/craftinginterpreters/tree/master/test) with appropriate additions and modifications (which mainly consist of removal of some parts related to clox, which differs in behaviour, and tests for WIP implementation, such as parsing tests). The suite is written using `pytest`.
+
+Additional tests for the REPL are planned.
 
 ## Current state of the project
 
