@@ -98,7 +98,7 @@ class TestOperators:
     def test_not_class(self, capsys, lox):
         lox.run_file("operator/not_class.lox")
         capture = capsys.readouterr().out
-        assert capture == "\n".join(["false"] * 2) + "\n"
+        assert capture == "false\n" * 2
 
     def test_equals(self, capsys, lox):
         lox.run_file("operator/equals.lox")
