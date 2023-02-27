@@ -8,11 +8,15 @@ This is my Python 3.10 reimplementation of jlox as described in the awesome book
 
 The program is run with the command (on openSUSE Linux)
 
-    python3.10 pylox.py <script>
+```console
+python3.10 pylox.py <script>
+```
 
 to run a Lox script or with
 
-    python3.10 pylox.py
+```console
+python3.10 pylox.py
+```
 
 to run the interactive interpreter. The program requires no external dependencies.
 
@@ -44,9 +48,10 @@ PyLox is mostly a direct translation of Java code in the book to Python (made id
   * `round` – rounding,
   * `abs` – absolute value.
 - Implementation detail: replaced the recursive method lookup with copy-down inheritance (clox-inspired) for performance—it reduces the number of condition checks and recursive method calls.
+- Slightly changed the output format when printing classes and instances: their names are enclosed in angle brackets (e.g. `<class MyClass>` and `<MyClass instance>`) (inspired by Python's output format).
 
 ## Current state of the project
 
-PyLox is considered complete (chapter 13 of the book completed). There is a plan to add a series of autotests and (possibly) modify the REPL to make it more comfortable to use.
+PyLox is considered complete (chapter 13 of the book completed). There is a plan to modify the REPL to make it more comfortable to use and add a special `require` function to load libraries (and extract the mathematical functions into a library).
 
 All variables, class attributes and functions are type-hinted, except where doing so would lead to circular imports.

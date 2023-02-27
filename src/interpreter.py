@@ -90,6 +90,8 @@ class Interpreter(ExprVisitor, StmtVisitor):
         if isinstance(obj, LoxInstance):
             return obj.get(expr.name)
 
+        raise LoxRuntimeError(expr.name, "Only instances have properties.")
+
     def visit_grouping_expr(self, expr: GroupingExpr) -> object:
         return self.__evaluate(expr.expression)
 

@@ -1,0 +1,9 @@
+class A {
+  method() {}
+}
+
+class B < A {
+  method() {
+    (super).method(); // Error at ')': Expect '.' after 'super'.
+  }
+}

@@ -1,0 +1,2 @@
+// expect runtime error: Undefined variable 'notDefined'.
+print notDefined;

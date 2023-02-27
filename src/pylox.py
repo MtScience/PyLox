@@ -56,7 +56,7 @@ class Lox:
             self.had_error = False  # Unset error flag to allow for printing after errors in REPL
 
     def run_file(self, path: str) -> None:
-        with open(path, "rt") as file:
+        with open(path, "rt", encoding="utf-8") as file:
             code = file.read()
 
         self.__run(code, OpMode.SCRIPT)
@@ -67,9 +67,9 @@ class Lox:
             sys.exit(70)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if (length := len(sys.argv)) > 2:
-        print("Usage: pylox [script]")
+        print("Usage: pylox.py [script]")
         sys.exit(64)
     elif length == 2:
         Lox().run_file(sys.argv[1])
