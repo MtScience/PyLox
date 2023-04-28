@@ -1,6 +1,7 @@
 import math
 import time
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 from errors import LoxFunctionError
 from lox_callable import LoxCallable
@@ -21,6 +22,23 @@ class LoxNativeFunction(LoxCallable, ABC):
 
     def __str__(self) -> str:
         return "<native fn>"
+
+
+class Require(LoxNativeFunction):
+    def __init__(self):
+        self.name: str = "require"
+
+    def arity(self) -> int:
+        return 1
+
+    def call(self, interpreter, arguments: list[object]) -> None:
+        lib = arguments[0]
+        lib_path = Path(str(lib))
+
+        if lib_path.is_file() and lib_path.suffix == ".lox":
+            interpreter.lox_main.run_file(lib)
+        else:
+            raise LoxFunctionError(self.name, f"{lib} not found or is not a valid Lox library")
 
 
 class Clock(LoxNativeFunction):
@@ -259,7 +277,7 @@ class Sign(MathFunction):
         return -1
 
 
-native_functions: list = [Clock, GetLine, Type, ToString, ToNumber, Exponent, Logarithm, ToRadians, Sine, Cosine,
-                          Tangent, ArcSine, ArcCosine, ArcTangent, Ceiling, Floor, Round, Absolute, Sign]
+native_functions: list = [Clock, GetLine, Type, ToString, ToNumber, Require, Exponent, Logarithm, ToRadians, Sine,
+                          Cosine, Tangent, ArcSine, ArcCosine, ArcTangent, Ceiling, Floor, Round, Absolute, Sign]
 
 __all__ = ["LoxNativeFunction", "native_functions"]
