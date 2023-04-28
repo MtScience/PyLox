@@ -21,7 +21,7 @@ class OpMode(Enum):
 
 class Interpreter(ExprVisitor, StmtVisitor):
     def __init__(self, lox_main):
-        self.__lox_main = lox_main
+        self.lox_main = lox_main
         self.globals: Environment = Environment()
         self.__environment: Environment = self.globals
         self.__locals: dict[Expr, int] = {}
@@ -45,14 +45,14 @@ class Interpreter(ExprVisitor, StmtVisitor):
             TokenType.EQUAL_EQUAL: lambda _, l, r: self.__is_equal(l, r)
         }
 
-        self.__define_natives()
+        self.define_natives(native_functions)
 
     def interpret(self, statements: list[Stmt], mode: OpMode) -> None:
         try:
             for statement in statements:
                 self.__mode_execute(statement, mode)
         except LoxRuntimeError as err:
-            self.__lox_main.runtime_error(err)
+            self.lox_main.runtime_error(err)
 
     def visit_assign_expr(self, expr: AssignExpr) -> object:
         value: object = self.__evaluate(expr.value)
@@ -334,8 +334,8 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     # Method to define native Lox functions (so as to not pollute the __init__)
 
-    def __define_natives(self) -> None:
-        for native in native_functions:
+    def define_natives(self, functions) -> None:
+        for native in functions:
             native: LoxNativeFunction = native()
             self.globals.define(native.name, native)
 
