@@ -66,6 +66,6 @@ Additional tests for the REPL are planned.
 
 ## Current state of the project
 
-PyLox is considered complete (chapter 13 of the book completed). Additionally, a special `require` function is added, which allows one to run external Lox scripts (and, by extension, load libraries, if the external script contains only definitions). There is also a plan to modify the REPL to make it more comfortable to use, if I have the time.
+PyLox is considered complete (chapter 13 of the book completed). Additionally, a special `require` function is added, which allows one to run external Lox scripts (and, by extension, load libraries, if the external script contains only definitions). There is also a plan to modify the REPL to make it more comfortable to use, if I have the time, and to make `require` accept Python files to allow for writing Lox libraries in Python.
 
 All variables, class attributes and functions are type-hinted, except where doing so would lead to circular imports.
