@@ -1,4 +1,5 @@
 import sys
+from argparse import ArgumentParser
 
 from errors import LoxRuntimeError
 from interpreter import *
@@ -44,16 +45,7 @@ class Lox:
 
         self.__interpreter.interpret(statements, mode)
 
-    def __run_options(self, options: dict) -> None:
-        if options is None:
-            return
-
-        if "-e" in options:
-            self.__run(options["-e"], OpMode.SCRIPT)
-
-    def run_repl(self, options: dict = None) -> None:
-        self.__run_options(options)
-
+    def run_repl(self) -> None:
         while True:
             try:
                 line = input("> ")
@@ -64,11 +56,10 @@ class Lox:
             self.__run(line, OpMode.INTERACTIVE)
             self.had_error = False  # Unset error flag to allow for printing after errors in REPL
 
-    def run_file(self, path: str, options: dict = None) -> None:
+    def run_file(self, path: str) -> None:
         with open(path, "rt", encoding="utf-8") as file:
             code = file.read()
 
-        self.__run_options(options)
         self.__run(code, OpMode.SCRIPT)
 
         if self.had_error:
@@ -76,56 +67,33 @@ class Lox:
         if self.had_runtime_error:
             sys.exit(70)
 
-        if options is not None and "-i" in options:
-            self.run_repl()
-
-
-def print_usage() -> None:
-    usage: str = "usage: python pylox.py [options] [script]\n\n" \
-                 "Available options:\n"\
-                 " -h        show this message and exit\n"\
-                 " -e str    run string 'str'\n"\
-                 " -i        enter interactive mode\n"
-    print(usage)
-
-
-def collect_options(given: list) -> tuple[dict, str | None]:
-    i: int = 0
-    options: dict = {}
-    script: str | None = None
-
-    while i < (length := len(given)):
-        match given[i]:
-            case "-i" | "-h": options |= {given[i]: None}
-            case "-e":
-                i += 1
-                if i >= length or given[i].startswith("-"):
-                    print(f"'-e' requires an argument")
-                    print_usage()
-                    sys.exit(64)
-                options |= {"-e": given[i]}
-            case _ if given[i].startswith("-"):
-                print(f"unrecognized option: '{given[i]}'")
-                print_usage()
-                sys.exit(64)
-            case _:
-                script = given[i]
-                break
-        i += 1
-
-    return options, script
-
 
 if __name__ == "__main__":
-    options: dict
-    script: str | None
-    options, script = collect_options(sys.argv[1:])
+    options_parser: ArgumentParser = ArgumentParser(prog="pylox.py")
+    options_parser.add_argument("script", nargs="?", default=None)
+    options_parser.add_argument("-i", "--interactive", action="store_true",
+                                help="run in interactive mode after executing a script "
+                                     "(if no script is given, does nothing)")
+    options_parser.add_argument("-e", "--execute", metavar="FILE",
+                                help="run the specified file before executing another"
+                                     " script or entering interactive mode")
+    options_parser.add_argument("-l", "--load", metavar="FILE", help="synonym to --execute")
 
-    if "-h" in options:
-        print_usage()
-        sys.exit()
+    options = options_parser.parse_args()
 
-    if script is not None:
-        Lox().run_file(script, options)
+    lox: Lox = Lox()
+
+    # Processing loading options
+    if options.execute is not None:
+        lox.run_file(options.execute)
+    if options.load is not None:
+        lox.run_file(options.load)
+
+    # Processing main script (or lack thereof)
+    if options.script is not None:
+        lox.run_file(options.script)
+
+        if options.interactive:
+            lox.run_repl()
     else:
-        Lox().run_repl(options)
+        lox.run_repl()
