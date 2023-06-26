@@ -20,6 +20,14 @@ python3.10 pylox.py
 
 to run the interactive interpreter. The program requires no external dependencies (however, `pytest` is required to run the test suite).
 
+The program accepts a number of options:
+- `-h`, `--help` — displays a help message and exits,
+- `-i`, `--interactive` — enters the REPL after running a script. If no script is given, this option is ignored,
+- `-e`, `--execute` — executes a file given as an option argument before running a script or entering the REPL,
+- `-l`, `--load` — synonymous to `--execute`. However, this option is intended for loading Lox libraries, instead of running arbitrary scripts. Also, `-l` is processed after `-e`, so one can run a script, then load a library and, finally, run the main Lox script.
+
+The options are implemented using the Python's `argparse` module.
+
 ## Differences from Robert's jlox
 
 PyLox is mostly a direct translation of Java code in the book to Python (made idiomatic where possible), so it doesn't have any major differences when it comes to behaviour. However, there are some differences:
@@ -58,6 +66,6 @@ Additional tests for the REPL are planned.
 
 ## Current state of the project
 
-PyLox is considered complete (chapter 13 of the book completed). There is a plan to modify the REPL to make it more comfortable to use and add a special `require` function to load libraries (and extract the mathematical functions into a library).
+PyLox is considered complete (chapter 13 of the book completed). Additionally, a special `require` function is added, which allows one to run external Lox scripts (and, by extension, load libraries, if the external script contains only definitions). There is also a plan to modify the REPL to make it more comfortable to use, if I have the time.
 
 All variables, class attributes and functions are type-hinted, except where doing so would lead to circular imports.
