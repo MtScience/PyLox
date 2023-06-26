@@ -45,7 +45,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
             TokenType.EQUAL_EQUAL: lambda _, l, r: self.__is_equal(l, r)
         }
 
-        self.define_natives(native_functions)
+        self.__define_natives(native_functions)
 
     def interpret(self, statements: list[Stmt], mode: OpMode) -> None:
         try:
@@ -334,7 +334,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     # Method to define native Lox functions (so as to not pollute the __init__)
 
-    def define_natives(self, functions) -> None:
+    def __define_natives(self, functions) -> None:
         for native in functions:
             native: LoxNativeFunction = native()
             self.globals.define(native.name, native)
