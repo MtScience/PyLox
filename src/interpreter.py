@@ -238,7 +238,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def __is_equal(a: object, b: object) -> bool:
         # Apparently, the original Java version treats anything of different types as unequal, so we're going to do the
         # same: is the types aren't precisely the same, the operands aren't equal, otherwise properly check for equality
-        return False if type(a) is not type(b) else a == b
+        return type(a) is type(b) and a == b
 
     @staticmethod
     def __is_truthy(obj: object) -> bool:
@@ -251,17 +251,13 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     @staticmethod
     def __check_number_operand(operator: Token, operand: object) -> None:
-        if isinstance(operand, float):
-            return
-
-        raise LoxRuntimeError(operator, "Operand must be a number.")
+        if not isinstance(operand, float):
+            raise LoxRuntimeError(operator, "Operand must be a number.")
 
     @staticmethod
     def __check_number_operands(operator: Token, left: object, right: object) -> None:
-        if isinstance(left, float) and isinstance(right, float):
-            return
-
-        raise LoxRuntimeError(operator, "Operands must be numbers.")
+        if not (isinstance(left, float) and isinstance(right, float)):
+            raise LoxRuntimeError(operator, "Operands must be numbers.")
 
     @staticmethod
     def __stringify(obj: object) -> str:
@@ -282,55 +278,55 @@ class Interpreter(ExprVisitor, StmtVisitor):
     @staticmethod
     def __binary_plus_handler(operator: Token, left: object, right: object) -> float | str:
         if isinstance(left, float) and isinstance(right, float):
-            return float(left) + float(right)
+            return left + right
 
         if isinstance(left, str) and isinstance(right, str):
-            return str(left) + str(right)
+            return left + right
 
         raise LoxRuntimeError(operator, "Operands must be two numbers or two strings.")
 
     def __binary_minus_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> float:
         self.__check_number_operands(operator, left, right)
-        return float(left) - float(right)
+        return left - right
 
     def __binary_slash_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> float:
         self.__check_number_operands(operator, left, right)
 
         # Java, apparently, automatically returns NaN when it encounters 0/0, but Python raises an error. Therefore,
         # we manually handle this case
-        return nan if left == right == 0 else float(left) / float(right)
+        return nan if left == right == 0 else left / right
 
     def __binary_percent_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> float:
         self.__check_number_operands(operator, left, right)
-        return float(left) % float(right)
+        return left % right
 
     def __binary_star_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> float:
         self.__check_number_operands(operator, left, right)
-        return float(left) * float(right)
+        return left * right
 
     def __binary_caret_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> float:
         self.__check_number_operands(operator, left, right)
-        return float(left) ** float(right)
+        return left ** right
 
     def __binary_gtr_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> bool:
         self.__check_number_operands(operator, left, right)
-        return float(left) > float(right)
+        return left > right
 
     def __binary_geq_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> bool:
         self.__check_number_operands(operator, left, right)
-        return float(left) >= float(right)
+        return left >= right
 
     def __binary_less_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> bool:
         self.__check_number_operands(operator, left, right)
-        return float(left) < float(right)
+        return left < right
 
     def __binary_leq_handler(self, operator: Token, left: SupportsFloat, right: SupportsFloat) -> bool:
         self.__check_number_operands(operator, left, right)
-        return float(left) <= float(right)
+        return left <= right
 
     def __unary_minus_handler(self, operator: Token, x: SupportsFloat) -> float:
         self.__check_number_operand(operator, x)
-        return -float(x)
+        return -x
 
     # Method to define native Lox functions (so as to not pollute the __init__)
 
@@ -340,4 +336,4 @@ class Interpreter(ExprVisitor, StmtVisitor):
             self.globals.define(native.name, native)
 
 
-__all__ = ["Interpreter", "OpMode"]
+__all__ = "Interpreter", "OpMode"
