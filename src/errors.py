@@ -19,4 +19,4 @@ class LoxFunctionError(Exception):
         super().__init__()
 
 
-__all__ = ["ParseError", "LoxRuntimeError", "LoxFunctionError"]
+__all__ = "ParseError", "LoxRuntimeError", "LoxFunctionError"
