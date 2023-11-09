@@ -129,7 +129,7 @@ class Parser:
                     break
 
         self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
-        self.__consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.")
+        self.__consume(TokenType.LEFT_BRACE, f"Expect '{{' before {kind} body.")
         body: list[Stmt] = self.__block()
 
         return FunctionStmt(name, parameters, body)
