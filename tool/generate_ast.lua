@@ -23,7 +23,7 @@ function define_all(file, exprtypes)
         exprtypes[i] = "\"" .. exprtype .. "\""
     end
 
-    file:write("__all__ = [", table.concat(exprtypes, ", "), "]\n")
+    file:write("__all__ = (", table.concat(exprtypes, ", "), ")\n")
 end
 
 function define_ast(out_dir, base_name, exprtypes, imports)
