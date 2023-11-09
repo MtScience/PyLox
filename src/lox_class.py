@@ -53,4 +53,4 @@ class LoxInstance:
         return f"<{self.klass.name} instance>"
 
 
-__all__ = ["LoxClass", "LoxInstance"]
+__all__ = "LoxClass", "LoxInstance"
