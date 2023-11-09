@@ -62,10 +62,8 @@ PyLox is mostly a direct translation of Java code in the book to Python (made id
 
 The test suite is taken directly from Robert's [suite](https://github.com/munificent/craftinginterpreters/tree/master/test) with appropriate additions and modifications (which mainly consist of removal of some parts related to clox, which differs in behaviour, and tests for WIP implementation, such as parsing tests). The suite is written using `pytest`.
 
-Additional tests for the REPL are planned.
-
 ## Current state of the project
 
-PyLox is considered complete (chapter 13 of the book completed). Additionally, a special `require` function is added, which allows one to run external Lox scripts (and, by extension, load libraries, if the external script contains only definitions). There is also a plan to modify the REPL to make it more comfortable to use, if I have the time, and to make `require` accept Python files to allow for writing Lox libraries in Python.
+PyLox is considered complete (chapter 13 of the book completed). Additionally, a special `require` function is added, which allows one to run external Lox scripts (and, by extension, load libraries, if the external script contains only definitions).
 
 All variables, class attributes and functions are type-hinted, except where doing so would lead to circular imports.
