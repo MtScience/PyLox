@@ -120,5 +120,5 @@ class ClassStmt(Stmt):
         return visitor.visit_class_stmt(self)
 
 
-__all__ = ["Stmt", "StmtVisitor", "BlockStmt", "ExpressionStmt", "FunctionStmt",
-           "IfStmt", "PrintStmt", "ReturnStmt", "VarStmt", "WhileStmt", "ClassStmt"]
+__all__ = ("Stmt", "StmtVisitor", "BlockStmt", "ExpressionStmt", "FunctionStmt",
+           "IfStmt", "PrintStmt", "ReturnStmt", "VarStmt", "WhileStmt", "ClassStmt")
