@@ -84,7 +84,7 @@ class Resolver(ExprVisitor, StmtVisitor):
     def visit_variable_expr(self, expr: VariableExpr) -> None:
         # Comparing as "is False" because "get" can return None, which is also false, but shouldn't satisfy the
         # condition
-        if len(self.__scopes) != 0 and self.__scopes[-1].get(expr.name.lexeme) is False:
+        if self.__scopes and self.__scopes[-1].get(expr.name.lexeme) is False:
             self.__lox_main.token_error(expr.name, "Can't read local variable in its own initializer.")
 
         self.__resolve_local(expr, expr.name)
@@ -196,20 +196,16 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__scopes.pop()
 
     def __declare(self, name: Token) -> None:
-        if len(self.__scopes) == 0:
-            return
+        if self.__scopes:
+            scope: dict[str, bool] = self.__scopes[-1]
+            if name.lexeme in scope:
+                self.__lox_main.token_error(name, "Already a variable with this name in this scope.")
 
-        scope: dict[str, bool] = self.__scopes[-1]
-        if name.lexeme in scope:
-            self.__lox_main.token_error(name, "Already a variable with this name in this scope.")
-
-        scope |= {name.lexeme: False}
+            scope |= {name.lexeme: False}
 
     def __define(self, name: Token) -> None:
-        if len(self.__scopes) == 0:
-            return
-
-        self.__scopes[-1] |= {name.lexeme: True}
+        if self.__scopes:
+            self.__scopes[-1] |= {name.lexeme: True}
 
 
-__all__ = "Resolver"
+__all__ = "Resolver",
