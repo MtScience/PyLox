@@ -37,4 +37,4 @@ class LoxFunction(LoxCallable):
         return f"<fn {self.__declaration.name.lexeme}>"
 
 
-__all__ = "LoxFunction"
+__all__ = "LoxFunction",
