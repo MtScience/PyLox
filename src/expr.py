@@ -157,5 +157,5 @@ class VariableExpr(Expr):
         return visitor.visit_variable_expr(self)
 
 
-__all__ = ["Expr", "ExprVisitor", "AssignExpr", "BinaryExpr", "CallExpr", "GetExpr", "GroupingExpr",
-           "LiteralExpr", "LogicalExpr", "SetExpr", "SuperExpr", "ThisExpr", "UnaryExpr", "VariableExpr"]
+__all__ = ("Expr", "ExprVisitor", "AssignExpr", "BinaryExpr", "CallExpr", "GetExpr", "GroupingExpr",
+           "LiteralExpr", "LogicalExpr", "SetExpr", "SuperExpr", "ThisExpr", "UnaryExpr", "VariableExpr")
