@@ -5,21 +5,21 @@ from tokenclass import *
 
 
 class Parser:
+    __synchronization_tokens: list[TokenType] = [
+        TokenType.CLASS,
+        TokenType.FUN,
+        TokenType.VAR,
+        TokenType.FOR,
+        TokenType.IF,
+        TokenType.WHILE,
+        TokenType.PRINT,
+        TokenType.RETURN
+    ]
+
     def __init__(self, tokens: list[Token], lox_main):
         self.__lox_main = lox_main
         self.__current: int = 0
         self.__tokens: list[Token] = tokens
-
-        self.__synchronization_tokens: list[TokenType] = [
-            TokenType.CLASS,
-            TokenType.FUN,
-            TokenType.VAR,
-            TokenType.FOR,
-            TokenType.IF,
-            TokenType.WHILE,
-            TokenType.PRINT,
-            TokenType.RETURN
-        ]
 
     def parse(self) -> list[Stmt]:
         statements: list[Stmt] = []
@@ -29,18 +29,18 @@ class Parser:
         return statements
 
     def __statement(self) -> Stmt:
-        if self.__match(TokenType.FOR):
-            return self.__for_statement()
-        if self.__match(TokenType.IF):
-            return self.__if_statement()
-        if self.__match(TokenType.PRINT):
-            return self.__print_statement()
-        if self.__match(TokenType.RETURN):
-            return self.__return_statement()
-        if self.__match(TokenType.WHILE):
-            return self.__while_statement()
-        if self.__match(TokenType.LEFT_BRACE):
-            return BlockStmt(self.__block())
+        stmt_tokens: dict[TokenType, callable] = {
+            TokenType.FOR: self.__for_statement,
+            TokenType.IF: self.__if_statement,
+            TokenType.PRINT: self.__print_statement,
+            TokenType.RETURN: self.__return_statement,
+            TokenType.WHILE: self.__while_statement,
+            TokenType.LEFT_BRACE: lambda: BlockStmt(self.__block())
+        }
+
+        for typ, stmt in stmt_tokens.items():
+            if self.__match(typ):
+                return stmt()
 
         return self.__expression_statement()
 
@@ -129,8 +129,7 @@ class Parser:
                     break
 
         self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
-
-        self.__consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.")
+        self.__consume(TokenType.LEFT_BRACE, f"Expect '{{' before {kind} body.")
         body: list[Stmt] = self.__block()
 
         return FunctionStmt(name, parameters, body)
@@ -394,4 +393,4 @@ class Parser:
             self.__advance()
 
 
-__all__ = "Parser"
+__all__ = "Parser",

@@ -54,6 +54,9 @@ class TokenType(Enum):
 
 
 class Token:
+    # Adding slots to minimize memory usage since we'll have a lot of tokens
+    __slots__ = "type", "lexeme", "literal", "line"
+
     def __init__(self, typ: TokenType, lexeme: str, literal: object | None, line: int):
         self.type: TokenType = typ
         self.lexeme: str = lexeme
@@ -64,4 +67,4 @@ class Token:
         return f"{self.type} {self.lexeme} {self.literal}"
 
 
-__all__ = ["Token", "TokenType"]
+__all__ = "Token", "TokenType"

@@ -1,5 +1,4 @@
 import sys
-from argparse import ArgumentParser
 
 from errors import LoxRuntimeError
 from interpreter import *
@@ -69,6 +68,8 @@ class Lox:
 
 
 if __name__ == "__main__":
+    from argparse import ArgumentParser
+
     options_parser: ArgumentParser = ArgumentParser(prog="pylox.py")
     options_parser.add_argument("script", nargs="?", default=None)
     options_parser.add_argument("-i", "--interactive", action="store_true",

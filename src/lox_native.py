@@ -10,6 +10,8 @@ from lox_function import LoxFunction
 
 
 class LoxNativeFunction(LoxCallable, ABC):
+    __slots__ = "name",
+
     @abstractmethod
     def __init__(self):
         self.name: str | None = None
@@ -280,4 +282,4 @@ class Sign(MathFunction):
 native_functions: list = [Clock, GetLine, Type, ToString, ToNumber, Require, Exponent, Logarithm, ToRadians, Sine,
                           Cosine, Tangent, ArcSine, ArcCosine, ArcTangent, Ceiling, Floor, Round, Absolute, Sign]
 
-__all__ = ["LoxNativeFunction", "native_functions"]
+__all__ = "LoxNativeFunction", "native_functions"

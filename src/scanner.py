@@ -4,29 +4,34 @@ from tokenclass import *
 
 
 class Scanner:
+    __keywords: dict[str: TokenType] = \
+        {"and": TokenType.AND,
+         "class": TokenType.CLASS,
+         "else": TokenType.ELSE,
+         "false": TokenType.FALSE,
+         "for": TokenType.FOR,
+         "fun": TokenType.FUN,
+         "if": TokenType.IF,
+         "nil": TokenType.NIL,
+         "or": TokenType.OR,
+         "print": TokenType.PRINT,
+         "return": TokenType.RETURN,
+         "super": TokenType.SUPER,
+         "this": TokenType.THIS,
+         "true": TokenType.TRUE,
+         "var": TokenType.VAR,
+         "while": TokenType.WHILE
+         }
+
+    __digits: str = string.digits
+    __letters: str = string.ascii_letters + "_"
+    __symbols: str = __letters + __digits
+
     def __init__(self, source: str, lox_main):
         self.__lox_main = lox_main
         self.__source: str = source
         self.__tokens: list[Token] = []
 
-        self.__keywords: dict[str: TokenType] = \
-            {"and": TokenType.AND,
-             "class": TokenType.CLASS,
-             "else": TokenType.ELSE,
-             "false": TokenType.FALSE,
-             "for": TokenType.FOR,
-             "fun": TokenType.FUN,
-             "if": TokenType.IF,
-             "nil": TokenType.NIL,
-             "or": TokenType.OR,
-             "print": TokenType.PRINT,
-             "return": TokenType.RETURN,
-             "super": TokenType.SUPER,
-             "this": TokenType.THIS,
-             "true": TokenType.TRUE,
-             "var": TokenType.VAR,
-             "while": TokenType.WHILE
-             }
         self.__token_strings: dict[str, callable] = \
             {"(": lambda _: TokenType.LEFT_PAREN,
              ")": lambda _: TokenType.RIGHT_PAREN,
@@ -51,9 +56,6 @@ class Scanner:
              "\n": lambda _: self.__newline_handler(),
              "\"": lambda _: self.__string()
              }
-        self.__digits: str = string.digits
-        self.__letters: str = string.ascii_letters + "_"
-        self.__symbols: str = self.__letters + self.__digits
 
         self.__start: int = 0
         self.__current: int = 0
@@ -143,10 +145,7 @@ class Scanner:
             self.__advance()
 
         text: str = self.__source[self.__start: self.__current]
-        typ: TokenType = self.__keywords.get(text)
-        if typ is None:
-            typ = TokenType.IDENTIFIER
-
+        typ: TokenType = self.__keywords.get(text, TokenType.IDENTIFIER)
         self.__add_simple_token(typ)
 
     # Special token handlers
@@ -163,4 +162,4 @@ class Scanner:
         self.__line += 1
 
 
-__all__ = "Scanner"
+__all__ = "Scanner",

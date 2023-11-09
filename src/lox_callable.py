@@ -12,4 +12,4 @@ class LoxCallable(ABC):
     def __str__(self) -> str: ...
 
 
-__all__ = "LoxCallable"
+__all__ = "LoxCallable",
