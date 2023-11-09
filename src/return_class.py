@@ -4,4 +4,4 @@ class Return(Exception):
         self.value: object | None = value
 
 
-__all__ = "Return"
+__all__ = "Return",
