@@ -1,5 +1,5 @@
-from errors import LoxRuntimeError
-from tokenclass import Token
+from .errors import LoxRuntimeError
+from .tokenclass import Token
 
 
 class Environment:

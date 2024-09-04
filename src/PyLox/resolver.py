@@ -1,9 +1,9 @@
 from collections import deque
 from enum import Enum, auto
 
-from expr import *
-from stmt import *
-from tokenclass import Token
+from .expr import *
+from .stmt import *
+from .tokenclass import Token
 
 
 class ClassType(Enum):

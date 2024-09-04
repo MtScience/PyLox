@@ -7,17 +7,13 @@ This is my Python 3.10 reimplementation of jlox as described in the awesome book
 ## Running
 
 The program is run with the command (on openSUSE Linux)
-
 ```console
-python3.10 pylox.py <script>
+$ python3.10 main.py <script>
 ```
-
 to run a Lox script or with
-
 ```console
-python3.10 pylox.py
+$ python3.10 main.py
 ```
-
 to run the interactive interpreter. The program requires no external dependencies (however, `pytest` is required to run the test suite).
 
 The program accepts a number of options:
@@ -58,11 +54,19 @@ PyLox is mostly a direct translation of Java code in the book to Python (made id
 - Implementation detail: replaced the recursive method lookup with copy-down inheritance (clox-inspired) for performance—it reduces the number of condition checks and recursive method calls.
 - Slightly changed the output format when printing classes and instances: their names are enclosed in angle brackets (e.g. `<class MyClass>` and `<MyClass instance>`) (inspired by Python's output format).
 
-## Test suite
+## Test Suite
 
 The test suite is taken directly from Robert's [suite](https://github.com/munificent/craftinginterpreters/tree/master/test) with appropriate additions and modifications (which mainly consist of removal of some parts related to clox, which differs in behaviour, and tests for WIP implementation, such as parsing tests). The suite is written using `pytest`.
 
-## Current state of the project
+### A Note on Running Tests
+
+The tests can be run by executing the command
+```console
+$ python3.10 -m pytest
+```
+from `/tests` directory.
+
+## Current State of the Project
 
 PyLox is considered complete (chapter 13 of the book completed). Additionally, a special `require` function is added, which allows one to run external Lox scripts (and, by extension, load libraries, if the external script contains only definitions).
 

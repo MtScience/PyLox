@@ -1,12 +1,12 @@
 import sys
 
-from errors import LoxRuntimeError
-from interpreter import *
-from parser import Parser
-from resolver import Resolver
-from scanner import Scanner
-from stmt import Stmt
-from tokenclass import *
+from .errors import LoxRuntimeError
+from .interpreter import *
+from .parser import Parser
+from .resolver import Resolver
+from .scanner import Scanner
+from .stmt import Stmt
+from .tokenclass import *
 
 
 class Lox:
@@ -48,7 +48,7 @@ class Lox:
         while True:
             try:
                 line = input("> ")
-            except EOFError:
+            except (EOFError, KeyboardInterrupt):
                 print()
                 break
 
@@ -65,36 +65,3 @@ class Lox:
             sys.exit(65)
         if self.had_runtime_error:
             sys.exit(70)
-
-
-if __name__ == "__main__":
-    from argparse import ArgumentParser
-
-    options_parser: ArgumentParser = ArgumentParser(prog="pylox.py")
-    options_parser.add_argument("script", nargs="?", default=None)
-    options_parser.add_argument("-i", "--interactive", action="store_true",
-                                help="run in interactive mode after executing a script "
-                                     "(if no script is given, does nothing)")
-    options_parser.add_argument("-e", "--execute", metavar="FILE",
-                                help="run the specified file before executing another"
-                                     " script or entering interactive mode")
-    options_parser.add_argument("-l", "--load", metavar="FILE", help="synonym to --execute")
-
-    options = options_parser.parse_args()
-
-    lox: Lox = Lox()
-
-    # Processing loading options
-    if options.execute is not None:
-        lox.run_file(options.execute)
-    if options.load is not None:
-        lox.run_file(options.load)
-
-    # Processing main script (or lack thereof)
-    if options.script is not None:
-        lox.run_file(options.script)
-
-        if options.interactive:
-            lox.run_repl()
-    else:
-        lox.run_repl()

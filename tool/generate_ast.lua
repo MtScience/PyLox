@@ -78,7 +78,7 @@ exprs = {"Assign   : name: Token, value: Expr",
          "This     : keyword: Token",
          "Unary    : operator: Token, right: Expr",
          "Variable : name: Token"}
-define_ast("../src", "Expr", exprs, {{from = "tokenclass", what = "Token"}})
+define_ast("../src/PyLox", "Expr", exprs, {{from = ".tokenclass", what = "Token"}})
 
 stmts = {"Block      : statements: list[Stmt]",
          "Expression : expression: Expr",
@@ -89,4 +89,4 @@ stmts = {"Block      : statements: list[Stmt]",
          "Var        : name: Token, initializer: Expr",
          "While      : condition: Expr, body: Stmt",
          "Class      : name: Token, superclass: VariableExpr | None, methods: list[FunctionStmt]"}
-define_ast("../src", "Stmt", stmts, {{from = "expr", what = "Expr, VariableExpr"}, {from = "tokenclass", what = "Token"}})
+define_ast("../src/PyLox", "Stmt", stmts, {{from = ".expr", what = "Expr, VariableExpr"}, {from = ".tokenclass", what = "Token"}})

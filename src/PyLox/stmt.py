@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from expr import Expr, VariableExpr
-from tokenclass import Token
+from .expr import Expr, VariableExpr
+from .tokenclass import Token
 
 
 class Stmt(ABC):

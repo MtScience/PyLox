@@ -1,7 +1,7 @@
-from errors import LoxRuntimeError
-from lox_callable import LoxCallable
-from lox_function import LoxFunction
-from tokenclass import Token
+from .errors import LoxRuntimeError
+from .lox_callable import LoxCallable
+from .lox_function import LoxFunction
+from .tokenclass import Token
 
 
 class LoxClass(LoxCallable):

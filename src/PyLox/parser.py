@@ -1,7 +1,7 @@
-from errors import ParseError
-from expr import *
-from stmt import *
-from tokenclass import *
+from .errors import ParseError
+from .expr import *
+from .stmt import *
+from .tokenclass import *
 
 
 class Parser:

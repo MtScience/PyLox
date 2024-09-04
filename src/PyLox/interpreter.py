@@ -2,16 +2,16 @@ from enum import Enum, auto
 from math import nan
 from typing import SupportsFloat
 
-from environment import Environment
-from errors import LoxRuntimeError, LoxFunctionError
-from expr import *
-from lox_callable import LoxCallable
-from lox_class import *
-from lox_function import LoxFunction
-from lox_native import *
-from return_class import Return
-from stmt import *
-from tokenclass import *
+from .environment import Environment
+from .errors import LoxRuntimeError, LoxFunctionError
+from .expr import *
+from .lox_callable import LoxCallable
+from .lox_class import *
+from .lox_function import LoxFunction
+from .lox_native import *
+from .return_class import Return
+from .stmt import *
+from .tokenclass import *
 
 
 class OpMode(Enum):

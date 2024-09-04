@@ -3,10 +3,10 @@ import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from errors import LoxFunctionError
-from lox_callable import LoxCallable
-from lox_class import *
-from lox_function import LoxFunction
+from .errors import LoxFunctionError
+from .lox_callable import LoxCallable
+from .lox_class import *
+from .lox_function import LoxFunction
 
 
 class LoxNativeFunction(LoxCallable, ABC):

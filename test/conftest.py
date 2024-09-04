@@ -1,6 +1,6 @@
 import pytest as pt
 
-from pylox import Lox
+from PyLox.pylox import Lox
 
 
 @pt.fixture

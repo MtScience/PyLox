@@ -1,6 +1,6 @@
 import string
 
-from tokenclass import *
+from .tokenclass import *
 
 
 class Scanner:

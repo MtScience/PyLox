@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from tokenclass import Token
+from .tokenclass import Token
 
 
 class Expr(ABC):
