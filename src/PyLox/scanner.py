@@ -115,7 +115,7 @@ class Scanner:
 
     def __string(self) -> None:
         while self.__peek() != "\"" and not self.__is_at_end():
-            if self.__peek == "\n":
+            if self.__peek() == "\n":
                 self.__line += 1
             self.__advance()
 
