@@ -5,7 +5,7 @@ description = "A Python 3.10 implementation of the Lox programming language"
 readme = "README.md"
 license = "LICENSE"
 requires-python = ">= 3.10"
-optional-dependencies = ["pytest~=7.2.1"]
+optional-dependencies = ["pytest >= 9.0.3"]
 authors = [{email = "matvey.science@gmail.com"}]
 maintainers = [{email = "matvey.science@gmail.com"}]
 
